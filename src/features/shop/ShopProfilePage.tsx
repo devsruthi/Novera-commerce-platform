@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useAuth } from '../../context/AuthContext'
 import { updateMyProfile, uploadAvatar } from '../../services/shopService'
+import { shop } from './shopUi'
 
 /** Shop owner personal profile (name, phone, avatar). */
 export function ShopProfilePage() {
@@ -38,25 +39,35 @@ export function ShopProfilePage() {
   }
 
   return (
-    <main className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-      <h1 className="font-[Syne] text-2xl font-extrabold">Your profile</h1>
-      <p className="mt-1 text-sm text-stone-500">
-        Personal account details for the shop owner.
-      </p>
+    <div className={shop.page}>
+      <header>
+        <h1 className={shop.title}>Profile</h1>
+        <p className={shop.subtitle}>
+          Personal account details for the shop owner.
+        </p>
+      </header>
 
-      <form className="mt-6 max-w-lg space-y-4" onSubmit={onSubmit}>
+      <form
+        className={`${shop.card} max-w-2xl space-y-5 p-5 sm:p-6`}
+        onSubmit={onSubmit}
+      >
         <div>
-          <p className="mb-2 text-sm font-medium">Avatar</p>
-          <div className="mb-2 flex items-center gap-3">
-            <div className="h-16 w-16 overflow-hidden rounded-full bg-stone-100">
+          <p className={shop.label}>Avatar</p>
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 overflow-hidden rounded-full bg-violet-100">
               {avatar ? (
                 <img src={avatar} alt="" className="h-full w-full object-cover" />
-              ) : null}
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-lg font-bold text-violet-700">
+                  {(name?.[0] || 'O').toUpperCase()}
+                </div>
+              )}
             </div>
             <input
               type="file"
               accept="image/*"
               disabled={!user || uploading}
+              className="text-sm text-slate-600"
               onChange={(e) => {
                 const file = e.target.files?.[0]
                 if (!file || !user) return
@@ -73,42 +84,42 @@ export function ShopProfilePage() {
           </div>
         </div>
 
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Name</span>
+        <label className="block">
+          <span className={shop.label}>Name</span>
           <input
-            className="w-full rounded-xl border border-stone-200 px-3 py-2"
+            className={shop.input}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Email</span>
+        <label className="block">
+          <span className={shop.label}>Email</span>
           <input
-            className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2"
+            className={`${shop.input} bg-slate-50`}
             value={user?.email ?? ''}
             disabled
           />
         </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Phone</span>
+        <label className="block">
+          <span className={shop.label}>Phone</span>
           <input
-            className="w-full rounded-xl border border-stone-200 px-3 py-2"
+            className={shop.input}
             value={phone ?? ''}
             onChange={(e) => setPhone(e.target.value)}
           />
         </label>
 
-        {message && <p className="text-sm text-stone-600">{message}</p>}
+        {message && <p className="text-sm text-slate-600">{message}</p>}
 
         <button
           type="submit"
           disabled={save.isPending || !user}
-          className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className={shop.btnPrimary}
         >
           {save.isPending ? 'Saving…' : 'Save profile'}
         </button>
       </form>
-    </main>
+    </div>
   )
 }

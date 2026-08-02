@@ -6,6 +6,7 @@ import {
   updateMyShop,
   uploadShopLogo,
 } from '../../services/shopService'
+import { shop } from './shopUi'
 
 /** Shop settings including logo upload to Storage. */
 export function ShopSettingsPage() {
@@ -54,17 +55,22 @@ export function ShopSettingsPage() {
   }
 
   return (
-    <main className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-      <h1 className="font-[Syne] text-2xl font-extrabold">Shop settings</h1>
-      <p className="mt-1 text-sm text-stone-500">
-        Update the public details for your storefront.
-      </p>
+    <div className={shop.page}>
+      <header>
+        <h1 className={shop.title}>Store Settings</h1>
+        <p className={shop.subtitle}>
+          Update the public details for your storefront.
+        </p>
+      </header>
 
-      <form className="mt-6 max-w-lg space-y-4" onSubmit={onSubmit}>
+      <form
+        className={`${shop.card} max-w-2xl space-y-5 p-5 sm:p-6`}
+        onSubmit={onSubmit}
+      >
         <div>
-          <p className="mb-2 text-sm font-medium">Logo</p>
-          <div className="mb-2 flex items-center gap-3">
-            <div className="h-16 w-16 overflow-hidden rounded-2xl bg-stone-100">
+          <p className={shop.label}>Logo</p>
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 overflow-hidden rounded-2xl bg-slate-100">
               {logo ? (
                 <img src={logo} alt="" className="h-full w-full object-cover" />
               ) : null}
@@ -73,6 +79,7 @@ export function ShopSettingsPage() {
               type="file"
               accept="image/*"
               disabled={!shopQuery.data || uploading}
+              className="text-sm text-slate-600"
               onChange={(e) => {
                 const file = e.target.files?.[0]
                 if (!file || !shopQuery.data) return
@@ -89,44 +96,44 @@ export function ShopSettingsPage() {
             />
           </div>
           {uploading && (
-            <p className="text-xs text-stone-500">Uploading logo…</p>
+            <p className="mt-2 text-xs text-violet-600">Uploading logo…</p>
           )}
         </div>
 
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Shop name</span>
+        <label className="block">
+          <span className={shop.label}>Shop name</span>
           <input
-            className="w-full rounded-xl border border-stone-200 px-3 py-2"
+            className={shop.input}
             value={shopName}
             onChange={(e) => setShopName(e.target.value)}
             required
           />
         </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Description</span>
+        <label className="block">
+          <span className={shop.label}>Description</span>
           <textarea
-            className="min-h-28 w-full rounded-xl border border-stone-200 px-3 py-2"
+            className={`${shop.input} min-h-28 resize-y`}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Address</span>
+        <label className="block">
+          <span className={shop.label}>Address</span>
           <input
-            className="w-full rounded-xl border border-stone-200 px-3 py-2"
+            className={shop.input}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
         </label>
-        {message && <p className="text-sm text-stone-600">{message}</p>}
+        {message && <p className="text-sm text-slate-600">{message}</p>}
         <button
           type="submit"
           disabled={save.isPending || !user}
-          className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className={shop.btnPrimary}
         >
           {save.isPending ? 'Saving…' : 'Save changes'}
         </button>
       </form>
-    </main>
+    </div>
   )
 }

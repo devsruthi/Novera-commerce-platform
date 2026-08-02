@@ -16,6 +16,7 @@ import {
   valuesFromProduct,
   type ProductFormValues,
 } from './components/ProductForm'
+import { shop } from './shopUi'
 
 /** Add or edit a shop product with Storage image uploads. */
 export function ShopProductFormPage() {
@@ -71,49 +72,59 @@ export function ShopProductFormPage() {
 
   if (shopQuery.isLoading || (isEdit && productQuery.isLoading)) {
     return (
-      <main className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="text-sm text-stone-500">Loading…</p>
-      </main>
+      <div className={shop.cardPad}>
+        <p className="text-sm text-slate-500">Loading…</p>
+      </div>
     )
   }
 
   if (!shopQuery.data) {
     return (
-      <main className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
         No shop found. Sign up as a shop owner or create a shop row in Supabase.
-      </main>
+      </div>
     )
   }
 
   if (isEdit && !productQuery.data) {
     return (
-      <main className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="font-semibold">Product not found</p>
-        <Link to="/shop/products" className="mt-2 inline-block text-indigo-600">
+      <div className={shop.cardPad}>
+        <p className="font-semibold text-slate-900">Product not found</p>
+        <Link
+          to="/shop/products"
+          className="mt-2 inline-block text-sm font-semibold text-violet-600"
+        >
           Back to products
         </Link>
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-      <div className="mb-6 flex items-center justify-between gap-3">
+    <div className={shop.page}>
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-[Syne] text-2xl font-extrabold">
-            {isEdit ? 'Edit product' : 'Add product'}
+          <h1 className={shop.title}>
+            {isEdit ? 'Edit Product' : 'Add Product'}
           </h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Images upload to Supabase Storage (`product-images`).
+          <p className={shop.subtitle}>
+            Fill in details and publish to your storefront.
           </p>
         </div>
-        <Link
-          to="/shop/products"
-          className="text-sm font-semibold text-stone-500 hover:text-stone-800"
-        >
-          Cancel
-        </Link>
-      </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to="/shop/products" className={shop.btnSecondary}>
+            Cancel
+          </Link>
+          <button
+            type="submit"
+            form="product-form"
+            disabled={save.isPending}
+            className={shop.btnPrimary}
+          >
+            {save.isPending ? 'Saving…' : isEdit ? 'Save Changes' : 'Publish'}
+          </button>
+        </div>
+      </header>
 
       <ProductForm
         key={productQuery.data?.id ?? 'new'}
@@ -121,6 +132,7 @@ export function ShopProductFormPage() {
         categories={categoriesQuery.data ?? []}
         busy={save.isPending}
         error={error}
+        submitLabel={isEdit ? 'Save Changes' : 'Publish'}
         onSubmit={(values) => {
           setError('')
           save.mutate(values)
@@ -130,6 +142,6 @@ export function ShopProductFormPage() {
           return uploadProductImages(shopQuery.data!.id, key, [...files])
         }}
       />
-    </main>
+    </div>
   )
 }
