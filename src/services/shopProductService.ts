@@ -113,18 +113,33 @@ export async function uploadProductImages(
   return urls
 }
 
+function slugifyCategoryName(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+export async function uploadCategoryImage(
+  shopId: string,
+  categoryId: string,
+  file: File,
+): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg'
+  return uploadPublicImage({
+    bucket: 'product-images',
+    path: `${shopId}/categories/${categoryId}.${ext}`,
+    file,
+  })
+}
+
 export async function createCategory(input: {
   name: string
   slug?: string
   image?: string | null
 }): Promise<DbCategory> {
-  const slug =
-    input.slug?.trim() ||
-    input.name
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
+  const slug = input.slug?.trim() || slugifyCategoryName(input.name)
 
   const { data, error } = await getSupabase()
     .from('categories')
@@ -143,19 +158,26 @@ export async function updateCategory(
   id: string,
   input: { name: string; slug?: string; image?: string | null },
 ): Promise<DbCategory> {
+  const patch: {
+    name: string
+    slug?: string
+    image?: string | null
+  } = {
+    name: input.name.trim(),
+  }
+
+  if (input.slug !== undefined) {
+    patch.slug = input.slug.trim() || slugifyCategoryName(input.name)
+  }
+
+  // Only overwrite image when the caller explicitly passes it
+  if ('image' in input) {
+    patch.image = input.image ?? null
+  }
+
   const { data, error } = await getSupabase()
     .from('categories')
-    .update({
-      name: input.name.trim(),
-      slug:
-        input.slug?.trim() ||
-        input.name
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-|-$/g, ''),
-      image: input.image ?? null,
-    })
+    .update(patch)
     .eq('id', id)
     .select('id, name, slug, image')
     .single()

@@ -6,6 +6,7 @@ import { getMyShop, listMyProducts } from '../../services/shopService'
 import {
   createCategory,
   updateCategory,
+  uploadCategoryImage,
 } from '../../services/shopProductService'
 import { shop } from './shopUi'
 
@@ -15,10 +16,15 @@ export function ShopCategoriesPage() {
   const qc = useQueryClient()
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
+  const [createImage, setCreateImage] = useState<string | null>(null)
+  const [createFile, setCreateFile] = useState<File | null>(null)
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [editImage, setEditImage] = useState<string | null>(null)
+  const [editFile, setEditFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const shopQuery = useQuery({
     queryKey: ['my-shop', user?.id],
@@ -47,10 +53,36 @@ export function ShopCategoriesPage() {
   }, [productsQuery.data])
 
   const create = useMutation({
-    mutationFn: () => createCategory({ name, slug: slug || undefined }),
+    mutationFn: async () => {
+      const shopId = shopQuery.data?.id
+      if (!shopId) throw new Error('Shop not found for this account.')
+
+      const created = await createCategory({
+        name,
+        slug: slug || undefined,
+        image: createImage,
+      })
+
+      if (createFile) {
+        setUploading(true)
+        try {
+          const url = await uploadCategoryImage(shopId, created.id, createFile)
+          return updateCategory(created.id, {
+            name: created.name,
+            image: url,
+          })
+        } finally {
+          setUploading(false)
+        }
+      }
+
+      return created
+    },
     onSuccess: async () => {
       setName('')
       setSlug('')
+      setCreateImage(null)
+      setCreateFile(null)
       setError('')
       setShowForm(false)
       await qc.invalidateQueries({ queryKey: ['categories'] })
@@ -59,9 +91,33 @@ export function ShopCategoriesPage() {
   })
 
   const saveEdit = useMutation({
-    mutationFn: () => updateCategory(editingId!, { name: editName }),
+    mutationFn: async () => {
+      const shopId = shopQuery.data?.id
+      if (!shopId || !editingId) {
+        throw new Error('Shop not found for this account.')
+      }
+
+      let imageUrl = editImage
+      if (editFile) {
+        setUploading(true)
+        try {
+          imageUrl = await uploadCategoryImage(shopId, editingId, editFile)
+        } finally {
+          setUploading(false)
+        }
+      }
+
+      return updateCategory(editingId, {
+        name: editName,
+        image: imageUrl,
+      })
+    },
     onSuccess: async () => {
       setEditingId(null)
+      setEditName('')
+      setEditImage(null)
+      setEditFile(null)
+      setError('')
       await qc.invalidateQueries({ queryKey: ['categories'] })
     },
     onError: (err: Error) => setError(err.message),
@@ -73,7 +129,23 @@ export function ShopCategoriesPage() {
     create.mutate()
   }
 
+  const startEdit = (cat: { id: string; name: string; image: string | null }) => {
+    setError('')
+    setEditingId(cat.id)
+    setEditName(cat.name)
+    setEditImage(cat.image)
+    setEditFile(null)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditName('')
+    setEditImage(null)
+    setEditFile(null)
+  }
+
   const categories = categoriesQuery.data ?? []
+  const busy = create.isPending || saveEdit.isPending || uploading
 
   return (
     <div className={shop.page}>
@@ -99,27 +171,61 @@ export function ShopCategoriesPage() {
       {showForm && (
         <form
           onSubmit={onCreate}
-          className={`${shop.card} grid gap-3 p-4 sm:grid-cols-[1fr_1fr_auto] sm:p-5`}
+          className={`${shop.card} grid gap-4 p-4 sm:grid-cols-[140px_1fr_1fr_auto] sm:items-end sm:p-5`}
         >
-          <input
-            className={shop.input}
-            placeholder="Category name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            className={shop.input}
-            placeholder="Slug (optional)"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-          />
+          <label className="block">
+            <span className={shop.label}>Thumbnail</span>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-slate-100">
+              {createImage ? (
+                <img
+                  src={createImage}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
+                  No image
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 cursor-pointer opacity-0"
+                disabled={busy}
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setCreateFile(file)
+                  setCreateImage(URL.createObjectURL(file))
+                }}
+              />
+            </div>
+          </label>
+          <label className="block">
+            <span className={shop.label}>Category name</span>
+            <input
+              className={shop.input}
+              placeholder="Category name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </label>
+          <label className="block">
+            <span className={shop.label}>Slug (optional)</span>
+            <input
+              className={shop.input}
+              placeholder="Slug (optional)"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+            />
+          </label>
           <button
             type="submit"
-            disabled={create.isPending}
+            disabled={busy}
             className={shop.btnPrimary}
           >
-            {create.isPending ? 'Adding…' : 'Create'}
+            {create.isPending || uploading ? 'Adding…' : 'Create'}
           </button>
         </form>
       )}
@@ -144,24 +250,44 @@ export function ShopCategoriesPage() {
         {categories.map((cat) => {
           const count = productCounts.get(cat.id) ?? 0
           const editing = editingId === cat.id
+          const previewImage = editing ? editImage : cat.image
           return (
             <article
               key={cat.id}
               className={`${shop.card} group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md`}
             >
               <div className="relative aspect-[4/3] bg-gradient-to-br from-violet-100 via-slate-100 to-violet-50">
-                {cat.image ? (
+                {previewImage ? (
                   <img
-                    src={cat.image}
+                    src={previewImage}
                     alt=""
                     className="h-full w-full object-cover"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
                     <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/80 text-xl font-bold text-violet-600 shadow-sm">
-                      {cat.name.slice(0, 1).toUpperCase()}
+                      {(editing ? editName : cat.name)
+                        .slice(0, 1)
+                        .toUpperCase() || '?'}
                     </span>
                   </div>
+                )}
+                {editing && (
+                  <label className="absolute inset-x-3 bottom-3 cursor-pointer rounded-xl bg-white/95 px-3 py-2 text-center text-xs font-semibold text-violet-700 shadow-sm backdrop-blur transition hover:bg-violet-50">
+                    {editImage ? 'Change image' : 'Upload image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      disabled={busy}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        setEditFile(file)
+                        setEditImage(URL.createObjectURL(file))
+                      }}
+                    />
+                  </label>
                 )}
               </div>
               <div className="flex items-start justify-between gap-2 p-4">
@@ -173,19 +299,22 @@ export function ShopCategoriesPage() {
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         autoFocus
+                        placeholder="Category name"
                       />
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
                           className={shop.btnPrimary}
+                          disabled={busy || !editName.trim()}
                           onClick={() => saveEdit.mutate()}
                         >
-                          Save
+                          {saveEdit.isPending || uploading ? 'Saving…' : 'Save'}
                         </button>
                         <button
                           type="button"
                           className={shop.btnGhost}
-                          onClick={() => setEditingId(null)}
+                          disabled={busy}
+                          onClick={cancelEdit}
                         >
                           Cancel
                         </button>
@@ -206,11 +335,8 @@ export function ShopCategoriesPage() {
                   <button
                     type="button"
                     className="rounded-lg p-2 text-slate-400 transition hover:bg-violet-50 hover:text-violet-700"
-                    title="Rename"
-                    onClick={() => {
-                      setEditingId(cat.id)
-                      setEditName(cat.name)
-                    }}
+                    title="Edit category"
+                    onClick={() => startEdit(cat)}
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path d="M12 20h9" />
