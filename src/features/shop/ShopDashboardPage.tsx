@@ -155,12 +155,12 @@ export function ShopDashboardPage() {
             {shopQuery.data?.shop_name || 'your shop'}.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" className={shop.btnPrimary}>
+        <div className="flex shrink-0 flex-nowrap items-center gap-2.5">
+          <button type="button" className={`${shop.btnPrimary} h-11 whitespace-nowrap`}>
             Export Report
           </button>
           <select
-            className={`${shop.input} w-auto min-w-[140px]`}
+            className="h-11 min-w-[148px] rounded-xl border border-violet-200 bg-white px-3.5 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
             value={range}
             onChange={(e) =>
               setRange(e.target.value as (typeof RANGE_OPTIONS)[number])

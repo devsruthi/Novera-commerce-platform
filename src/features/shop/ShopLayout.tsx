@@ -134,6 +134,8 @@ export function ShopLayout() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [navOpen, setNavOpen] = useState(false)
+  const [logoutOpen, setLogoutOpen] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
   const shopQuery = useQuery({
     queryKey: ['my-shop', user?.id],
@@ -159,6 +161,25 @@ export function ShopLayout() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
+
+  useEffect(() => {
+    if (!logoutOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLogoutOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [logoutOpen])
+
+  const confirmLogout = async () => {
+    setSigningOut(true)
+    try {
+      await signOut()
+    } finally {
+      setSigningOut(false)
+      setLogoutOpen(false)
+    }
+  }
 
   const handleSearchChange = (value: string) => {
     if (onProductsList) {
@@ -232,39 +253,97 @@ export function ShopLayout() {
           </nav>
 
           <div className="border-t border-slate-100 p-3">
-            <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-              <div className="h-10 w-10 overflow-hidden rounded-full bg-violet-100">
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm font-bold text-violet-700">
-                    {(user?.name?.[0] || 'O').toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-slate-800">
-                  {shopName}
-                </p>
-                <p className="text-xs text-slate-500">Owner</p>
+            <div className="rounded-2xl bg-slate-50/80 p-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 overflow-hidden rounded-full bg-violet-100 ring-2 ring-white">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm font-bold text-violet-700">
+                      {(user?.name?.[0] || 'O').toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-slate-800">
+                    {shopName}
+                  </p>
+                  <p className="text-xs text-slate-500">Owner</p>
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() => void signOut()}
-                title="Sign out"
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-50 hover:text-slate-700"
+                onClick={() => setLogoutOpen(true)}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-3 py-2.5 text-sm font-semibold text-rose-600 shadow-sm transition hover:border-rose-300 hover:bg-rose-50"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
                 </svg>
+                Logout
               </button>
             </div>
           </div>
         </aside>
+
+        {logoutOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-[2px]"
+            role="presentation"
+            onClick={() => !signingOut && setLogoutOpen(false)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="shop-logout-title"
+              className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
+              </div>
+              <h2
+                id="shop-logout-title"
+                className="mt-4 text-center text-lg font-bold text-slate-900"
+              >
+                Log out of Novera?
+              </h2>
+              <p className="mt-2 text-center text-sm text-slate-500">
+                You’re signed in as{' '}
+                <span className="font-semibold text-slate-700">
+                  {user?.email || shopName}
+                </span>
+                . You’ll need to sign in again to manage your shop.
+              </p>
+              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  className={shop.btnSecondary}
+                  disabled={signingOut}
+                  onClick={() => setLogoutOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={signingOut}
+                  onClick={() => void confirmLogout()}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold !text-white shadow-md shadow-rose-600/25 transition hover:bg-rose-700 disabled:opacity-60"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                  </svg>
+                  {signingOut ? 'Logging out…' : 'Logout'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur sm:gap-4 sm:px-6">
