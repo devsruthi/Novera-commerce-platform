@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="stylaBg" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#312e81"/>
+      <stop offset="0.55" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="stylaStar" x1="20" y1="16" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5f3ff"/>
+      <stop offset="1" stop-color="#c4b5fd"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#stylaBg)"/>
+  <path
+    d="M32 12c1.2 6.8 5.2 10.8 12 12-6.8 1.2-10.8 5.2-12 12-1.2-6.8-5.2-10.8-12-12 6.8-1.2 10.8-5.2 12-12Z"
+    fill="url(#stylaStar)"
+  />
+  <circle cx="46" cy="18" r="2.2" fill="#ddd6fe" opacity="0.9"/>
+  <circle cx="18" cy="44" r="1.6" fill="#ddd6fe" opacity="0.7"/>
+</svg>

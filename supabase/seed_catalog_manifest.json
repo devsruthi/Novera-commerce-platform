@@ -1,0 +1,20 @@
+{
+  "total": 520,
+  "by_category": {
+    "dresses": 110,
+    "tops": 120,
+    "bottoms": 100,
+    "outerwear": 90,
+    "accessories": 100
+  },
+  "removed_categories": [
+    "shoes",
+    "electronics",
+    "other"
+  ],
+  "sources": [
+    "dummyjson fashion",
+    "curated Unsplash apparel galleries"
+  ],
+  "images": "images[0]=cover (full-res), remaining=gallery slides (no low-res thumbnail.webp)"
+}

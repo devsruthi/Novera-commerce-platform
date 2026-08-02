@@ -1,0 +1,13 @@
+-- Optional demo seed: one shop + sample products for local UI testing.
+-- Replace OWNER_UUID with a shop_owner profile id after signup.
+
+-- Example (uncomment and paste a real owner uuid):
+-- insert into public.shops (owner_id, shop_name, description, address)
+-- values (
+--   'OWNER_UUID',
+--   'Styla Studio',
+--   'Curated fashion for everyday and travel.',
+--   'Berlin, DE'
+-- )
+-- on conflict (owner_id) do update set shop_name = excluded.shop_name
+-- returning id;
