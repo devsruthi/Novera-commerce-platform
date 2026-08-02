@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
 import { homePathForRole } from '../../../services/authService'
@@ -457,7 +457,7 @@ export function LoginPage() {
                   </span>
                   <span className="relative block">
                     <svg
-                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-600"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -467,7 +467,7 @@ export function LoginPage() {
                       <path d="m3 7 9 6 9-6" />
                     </svg>
                     <input
-                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                      className="w-full rounded-xl border border-violet-300 bg-white py-2.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
                       type="email"
                       autoComplete="email"
                       placeholder="Enter your email"
@@ -484,7 +484,7 @@ export function LoginPage() {
                   </span>
                   <span className="relative block">
                     <svg
-                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-600"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -494,7 +494,7 @@ export function LoginPage() {
                       <path d="M8 11V8a4 4 0 0 1 8 0v3" />
                     </svg>
                     <input
-                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-11 pr-12 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                      className="w-full rounded-xl border border-violet-300 bg-white py-2.5 pl-11 pr-12 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="current-password"
                       placeholder="Enter your password"
@@ -553,38 +553,6 @@ export function LoginPage() {
                 </button>
               </form>
 
-              <div className="my-5 flex items-center gap-3">
-                <div className="h-px flex-1 bg-slate-200" />
-                <span className="text-xs font-medium text-slate-400">
-                  or continue with
-                </span>
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
-
-              <div className="grid grid-cols-3 gap-2.5">
-                <SocialButton label="Google">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24">
-                    <path
-                      fill="#EA4335"
-                      d="M12 10.2v3.9h5.5c-.2 1.3-1.7 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.4 12 2.4 6.9 2.4 2.7 6.6 2.7 11.7S6.9 21 12 21c5.2 0 8.6-3.6 8.6-8.7 0-.6-.1-1-.2-1.5H12z"
-                    />
-                    <path fill="#34A853" d="M3.9 7.5l3.2 2.4C8 8 9.9 6.7 12 6.7c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.4 12 2.4 8.5 2.4 5.5 4.4 3.9 7.5z" />
-                    <path fill="#FBBC05" d="M12 21c2.5 0 4.6-.8 6.1-2.3l-3-2.4c-.8.6-1.9 1-3.1 1-2.4 0-4.4-1.6-5.1-3.8l-3.2 2.5C5.4 18.7 8.4 21 12 21z" />
-                    <path fill="#4285F4" d="M20.6 12.3c0-.6-.1-1-.2-1.5H12v3.9h5.5c-.3 1.3-1.1 2.3-2.2 3l3 2.4c1.8-1.7 2.3-4.2 2.3-7.8z" />
-                  </svg>
-                </SocialButton>
-                <SocialButton label="Apple">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16.7 12.6c0-2.1 1.7-3.1 1.8-3.2-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.1.8s-1.6-.8-2.7-.7c-1.4.1-2.6.8-3.3 2.1-1.4 2.5-.4 6.1 1 8.1.7 1 1.5 2 2.6 2 .1 0 .6-.2 1.2-.2s.9.2 1.2.2c1 0 1.8-1 2.5-1.9.8-1.1 1.1-2.2 1.1-2.2s-2.1-.8-1.9-3.4zM14.7 6.5c.5-.7.9-1.6.8-2.5-.8 0-1.7.5-2.3 1.2-.5.6-.9 1.5-.8 2.4 1 0 1.7-.5 2.3-1.1z" />
-                  </svg>
-                </SocialButton>
-                <SocialButton label="Facebook">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#1877F2">
-                    <path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.6l.4-3H13v-1c0-.6.4-1 1-1z" />
-                  </svg>
-                </SocialButton>
-              </div>
-
               <p className="mt-5 text-center text-sm text-slate-500">
                 New here?{' '}
                 <Link
@@ -599,24 +567,5 @@ export function LoginPage() {
         </div>
       </div>
     </div>
-  )
-}
-
-function SocialButton({
-  label,
-  children,
-}: {
-  label: string
-  children: ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={`${label} sign-in coming soon`}
-      className="flex h-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 shadow-sm transition hover:border-violet-200 hover:bg-violet-50/50"
-    >
-      {children}
-    </button>
   )
 }
