@@ -42,6 +42,42 @@ const FEATURES = [
   },
 ]
 
+const GOLDEN_ORBS = [
+  { className: '-left-3 top-[6%] h-2 w-2 bg-amber-300', delay: '0s', duration: '2.4s' },
+  { className: 'left-[38%] top-[-1%] h-1.5 w-1.5 bg-yellow-200', delay: '0.4s', duration: '1.8s' },
+  { className: 'right-[6%] top-[14%] h-2.5 w-2.5 bg-amber-200', delay: '0.9s', duration: '2.8s' },
+  { className: 'left-[14%] top-[42%] h-1 w-1 bg-amber-400', delay: '1.3s', duration: '1.6s' },
+  { className: 'right-[20%] bottom-[24%] h-1.5 w-1.5 bg-yellow-300', delay: '0.2s', duration: '2.1s' },
+  { className: 'left-[4%] bottom-[10%] h-2 w-2 bg-amber-300', delay: '1.7s', duration: '3s' },
+  { className: 'left-[62%] top-[22%] h-1 w-1 bg-yellow-300', delay: '0.6s', duration: '1.5s' },
+  { className: 'left-[72%] top-[58%] h-2 w-2 bg-amber-200', delay: '1.1s', duration: '2.6s' },
+  { className: 'left-[48%] top-[68%] h-1 w-1 bg-amber-400', delay: '2s', duration: '1.9s' },
+  { className: 'right-[2%] bottom-[40%] h-1.5 w-1.5 bg-yellow-200', delay: '0.8s', duration: '2.3s' },
+  { className: 'left-[30%] bottom-[30%] h-[3px] w-[3px] bg-amber-300', delay: '1.5s', duration: '1.4s' },
+  { className: 'left-[88%] top-[8%] h-1 w-1 bg-amber-300', delay: '0.3s', duration: '2s' },
+  { className: 'left-[-1%] top-[58%] h-1.5 w-1.5 bg-yellow-300', delay: '1.9s', duration: '2.5s' },
+  { className: 'left-[55%] top-[36%] h-[3px] w-[3px] bg-amber-200', delay: '0.1s', duration: '1.7s' },
+  { className: 'right-[30%] top-[4%] h-2 w-2 bg-amber-300', delay: '1.4s', duration: '2.9s' },
+  { className: 'left-[22%] bottom-[2%] h-1 w-1 bg-yellow-200', delay: '2.2s', duration: '1.6s' },
+]
+
+const GOLDEN_STARS = [
+  { className: 'left-[26%] top-[5%] h-3 w-3 text-amber-400', delay: '0.2s', duration: '2.2s' },
+  { className: 'right-[3%] top-[36%] h-2.5 w-2.5 text-yellow-400', delay: '0.7s', duration: '1.9s' },
+  { className: 'left-[1%] top-[30%] h-2 w-2 text-amber-300', delay: '1.1s', duration: '2.6s' },
+  { className: 'right-[16%] bottom-[7%] h-3.5 w-3.5 text-amber-400', delay: '0.4s', duration: '3.1s' },
+  { className: 'left-[52%] bottom-[3%] h-2 w-2 text-yellow-300', delay: '1.6s', duration: '1.7s' },
+  { className: 'left-[70%] top-[12%] h-[9px] w-[9px] text-amber-300', delay: '0.1s', duration: '2s' },
+  { className: 'left-[8%] top-[72%] h-2.5 w-2.5 text-yellow-400', delay: '1.3s', duration: '2.4s' },
+  { className: 'left-[44%] top-[28%] h-[7px] w-[7px] text-amber-400', delay: '0.9s', duration: '1.5s' },
+  { className: 'right-[8%] top-[62%] h-3 w-3 text-amber-300', delay: '1.8s', duration: '2.7s' },
+  { className: 'left-[34%] bottom-[18%] h-2 w-2 text-yellow-300', delay: '0.5s', duration: '2.1s' },
+  { className: 'left-[80%] bottom-[34%] h-[8px] w-[8px] text-amber-400', delay: '1.2s', duration: '1.8s' },
+  { className: 'left-[16%] top-[16%] h-[6px] w-[6px] text-yellow-200', delay: '2.1s', duration: '2.3s' },
+  { className: 'right-[28%] top-[48%] h-2 w-2 text-amber-300', delay: '0.6s', duration: '1.6s' },
+  { className: 'left-[60%] bottom-[16%] h-[10px] w-[10px] text-yellow-400', delay: '1.5s', duration: '2.8s' },
+]
+
 /** Single-viewport Novera login — gradient backdrop + overlapping hero. */
 export function LoginPage() {
   const { login, user, loading, configured } = useAuth()
@@ -162,6 +198,25 @@ export function LoginPage() {
               WebkitMaskComposite: 'source-in',
             }}
           />
+          {/* Golden glitter on sweater */}
+          <svg
+            aria-hidden
+            className="login-glitter absolute left-[18%] top-[42%] z-10 h-3.5 w-3.5 text-amber-400"
+            style={{ animationDelay: '0.3s', animationDuration: '2.1s' }}
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 0L13.8 10.2L24 12L13.8 13.8L12 24L10.2 13.8L0 12L10.2 10.2L12 0Z" />
+          </svg>
+          <svg
+            aria-hidden
+            className="login-glitter absolute left-[34%] top-[56%] z-10 h-2.5 w-2.5 text-yellow-300"
+            style={{ animationDelay: '1.1s', animationDuration: '1.8s' }}
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 0L13.8 10.2L24 12L13.8 13.8L12 24L10.2 13.8L0 12L10.2 10.2L12 0Z" />
+          </svg>
         </div>
       </div>
 
@@ -169,13 +224,44 @@ export function LoginPage() {
         <div className="grid h-full w-full items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,400px)] lg:gap-16 xl:gap-24">
           {/* Left marketing panel */}
           <section className="relative z-20 flex max-w-xl flex-col justify-center gap-4 py-4 lg:py-0">
-            <Link to="/" className="inline-flex w-fit items-center gap-2.5">
+            {/* Golden star & spark accents */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 z-0 overflow-visible"
+            >
+              {GOLDEN_ORBS.map((orb, i) => (
+                <span
+                  key={`orb-${i}`}
+                  className={`login-glitter-orb absolute rounded-full ${orb.className}`}
+                  style={{
+                    animationDelay: orb.delay,
+                    animationDuration: orb.duration,
+                  }}
+                />
+              ))}
+              {GOLDEN_STARS.map((star, i) => (
+                <svg
+                  key={`star-${i}`}
+                  className={`login-glitter absolute ${star.className}`}
+                  style={{
+                    animationDelay: star.delay,
+                    animationDuration: star.duration,
+                  }}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 0L13.8 10.2L24 12L13.8 13.8L12 24L10.2 13.8L0 12L10.2 10.2L12 0Z" />
+                </svg>
+              ))}
+            </div>
+
+            <Link to="/" className="relative z-10 inline-flex w-fit items-center gap-2.5">
               <img
                 src="/novera-icon.png"
                 alt=""
-                className="h-10 w-10 rounded-xl object-cover shadow-md shadow-violet-400/30 sm:h-11 sm:w-11 sm:rounded-[14px]"
+                className="h-10 w-10 rounded-xl object-cover shadow-md shadow-violet-400/30 sm:h-10 sm:w-10 sm:rounded-[14px]"
               />
-              <span className="text-2xl font-extrabold tracking-tight text-violet-700 sm:text-[1.75rem]">
+              <span className="text-2xl font-extrabold tracking-tight text-violet-700 sm:text-[1.445rem]">
                 NOVERA
               </span>
             </Link>
@@ -187,15 +273,15 @@ export function LoginPage() {
 
             <div>
               <h1 className="text-[2rem] font-extrabold leading-[1.12] tracking-tight sm:text-4xl xl:text-[2.75rem]">
-                <span className="block text-slate-900">Shop. Sell. Grow.</span>
-                <span className="block bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent">
+                <span className="login-headline-line block text-slate-900">
+                  Shop. Sell. Grow.
+                </span>
+                <span className="login-headline-accent block bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent">
                   All in one place.
                 </span>
               </h1>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-500 sm:text-[15px]">
-                One account for two journeys — customers shop curated collections,
-                and shop owners manage inventory, categories, and store
-                performance.
+                One account for two journeys — shop curated collections, or manage inventory and store performance.
               </p>
             </div>
 
