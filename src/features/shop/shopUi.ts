@@ -6,9 +6,9 @@ export const shop = {
   title: 'text-2xl font-bold tracking-tight text-slate-900',
   subtitle: 'mt-1 text-sm text-slate-500',
   btnPrimary:
-    'inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 disabled:opacity-60',
+    'inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold !text-white shadow-md shadow-violet-600/30 transition hover:bg-violet-700 hover:shadow-lg hover:shadow-violet-600/35 disabled:opacity-60',
   btnSecondary:
-    'inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50',
+    'inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm shadow-slate-900/5 transition hover:bg-slate-50 hover:shadow-md hover:shadow-slate-900/10',
   btnGhost:
     'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800',
   input:

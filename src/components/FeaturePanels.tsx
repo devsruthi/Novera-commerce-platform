@@ -303,7 +303,7 @@ function AssistantPanel({
       <div className="assistant-panel-head">
         <img
           className="assistant-brand-icon"
-          src="/styla-icon.svg"
+          src="/novera-icon.png"
           alt=""
           width={40}
           height={40}
@@ -322,7 +322,7 @@ function AssistantPanel({
             <div key={m.id} className={`chat-row is-${m.role}`}>
               {m.role === 'assistant' && (
                 <span className="chat-avatar" aria-hidden>
-                  <img src="/styla-icon.svg" alt="" width={22} height={22} />
+                  <img src="/novera-icon.png" alt="" width={22} height={22} />
                 </span>
               )}
               <div className={`chat-bubble is-${m.role}`}>{m.text}</div>
@@ -331,7 +331,7 @@ function AssistantPanel({
           {busy && (
             <div className="chat-row is-assistant">
               <span className="chat-avatar" aria-hidden>
-                <img src="/styla-icon.svg" alt="" width={22} height={22} />
+                <img src="/novera-icon.png" alt="" width={22} height={22} />
               </span>
               <div className="chat-bubble is-assistant is-typing" aria-label="Thinking">
                 <span />

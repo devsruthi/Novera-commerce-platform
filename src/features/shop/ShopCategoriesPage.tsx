@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { listCategories } from '../../services/productService'
 import { getMyShop, listMyProducts } from '../../services/shopService'
@@ -272,7 +273,7 @@ export function ShopCategoriesPage() {
                     </span>
                   </div>
                 )}
-                {editing && (
+                {editing ? (
                   <label className="absolute inset-x-3 bottom-3 cursor-pointer rounded-xl bg-white/95 px-3 py-2 text-center text-xs font-semibold text-violet-700 shadow-sm backdrop-blur transition hover:bg-violet-50">
                     {editImage ? 'Change image' : 'Upload image'}
                     <input
@@ -288,6 +289,16 @@ export function ShopCategoriesPage() {
                       }}
                     />
                   </label>
+                ) : (
+                  <Link
+                    to={`/shop/products?category=${encodeURIComponent(cat.id)}`}
+                    className="absolute inset-0 flex items-center justify-center bg-slate-900/0 opacity-0 transition hover:bg-slate-900/45 hover:opacity-100 focus-visible:bg-slate-900/45 focus-visible:opacity-100"
+                    aria-label={`View products in ${cat.name}`}
+                  >
+                    <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-violet-700 shadow-sm">
+                      Click to view
+                    </span>
+                  </Link>
                 )}
               </div>
               <div className="flex items-start justify-between gap-2 p-4">

@@ -1,8 +1,16 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { getMyShop } from '../../services/shopService'
+import { shop } from './shopUi'
 
 type NavItem = {
   to: string
@@ -112,11 +120,21 @@ function navClass({ isActive }: { isActive: boolean }) {
   }`
 }
 
+function isProductsListPath(pathname: string) {
+  return (
+    pathname === '/shop/products' ||
+    pathname === '/shop/products/'
+  )
+}
+
 /** Shop-owner shell — Novera sidebar + top bar. */
 export function ShopLayout() {
   const { user, signOut } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [navOpen, setNavOpen] = useState(false)
+  const searchRef = useRef<HTMLInputElement>(null)
   const shopQuery = useQuery({
     queryKey: ['my-shop', user?.id],
     enabled: Boolean(user?.id),
@@ -124,10 +142,40 @@ export function ShopLayout() {
   })
 
   const shopName = shopQuery.data?.shop_name || 'Your shop'
+  const onProductsList = isProductsListPath(location.pathname)
+  const searchValue = onProductsList ? (searchParams.get('q') ?? '') : ''
 
   useEffect(() => {
     setNavOpen(false)
   }, [location.pathname])
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        searchRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  const handleSearchChange = (value: string) => {
+    if (onProductsList) {
+      const next = new URLSearchParams(searchParams)
+      if (value.trim()) next.set('q', value)
+      else next.delete('q')
+      setSearchParams(next, { replace: true })
+      return
+    }
+
+    const params = new URLSearchParams()
+    if (value.trim()) params.set('q', value)
+    navigate({
+      pathname: '/shop/products',
+      search: params.toString() ? `?${params}` : '',
+    })
+  }
 
   return (
     <div className="min-h-screen bg-[#F4F5F9] text-slate-900">
@@ -145,12 +193,14 @@ export function ShopLayout() {
             navOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="px-5 py-5">
-            <Link to="/shop" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600 text-sm font-bold text-white">
-                N
-              </span>
-              <span className="text-lg font-bold tracking-tight text-slate-900">
+          <div className="px-4 py-5">
+            <Link to="/shop" className="inline-flex items-center gap-3">
+              <img
+                src="/novera-icon.png"
+                alt="Novera"
+                className="h-14 w-14 shrink-0 rounded-2xl object-cover shadow-md shadow-violet-400/35 sm:h-16 sm:w-16"
+              />
+              <span className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
                 NOVERA
               </span>
             </Link>
@@ -230,7 +280,7 @@ export function ShopLayout() {
             </button>
             <div className="relative max-w-xl flex-1">
               <svg
-                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-500"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -240,44 +290,37 @@ export function ShopLayout() {
                 <path d="m20 20-3.5-3.5" />
               </svg>
               <input
+                ref={searchRef}
                 type="search"
-                placeholder="Search products, orders, customers…"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-2 focus:ring-violet-100"
+                value={searchValue}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search products, SKU, categories…"
+                className="w-full rounded-xl border border-violet-300 bg-violet-50 py-2.5 pl-10 pr-14 text-sm text-slate-800 shadow-sm shadow-violet-200/50 outline-none transition placeholder:text-violet-400/80 focus:border-violet-500 focus:bg-violet-50/80 focus:ring-2 focus:ring-violet-200"
               />
+              <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-violet-200 bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-violet-500 sm:inline">
+                ⌘K
+              </kbd>
             </div>
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
-                className="rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
+                className="relative rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
                 aria-label="Notifications"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                   <path d="M10.3 21a1.7 1.7 0 0 0 3.4 0" />
                 </svg>
+                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                  5
+                </span>
               </button>
-              <button
-                type="button"
-                className="rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
-                aria-label="Messages"
-              >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H8l-4 3V6a1 1 0 0 1 1-1z" />
+              <Link to="/shop/products/new" className={shop.btnPrimary}>
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M5 12h14" />
                 </svg>
-              </button>
-              <div className="ml-1 h-9 w-9 overflow-hidden rounded-full bg-violet-100 ring-2 ring-white">
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-xs font-bold text-violet-700">
-                    {(user?.name?.[0] || 'O').toUpperCase()}
-                  </div>
-                )}
-              </div>
+                Add Product
+              </Link>
             </div>
           </header>
 
