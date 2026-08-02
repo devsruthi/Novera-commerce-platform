@@ -60,7 +60,8 @@ export function ProductCard({ item, index }: ProductCardProps) {
             </span>
           )}
           <span className="rating">
-            {product.rating.toFixed(1)}★
+            {product.rating.toFixed(1)}
+            <span className="rating-star">★</span>
             {product.reviewCount > 0 ? ` · ${product.reviewCount}` : ''}
           </span>
         </div>

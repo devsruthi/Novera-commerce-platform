@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   browseProducts,
+  listCategories,
   listDistinctBrands,
   type BrowseFilters,
 } from '../../services/productService'
@@ -21,7 +22,7 @@ function toBrowse(
 ): BrowseFilters {
   return {
     q: filters.q.trim() || undefined,
-    categorySlug,
+    categorySlug: categorySlug || undefined,
     minPrice: filters.minPrice ? Number(filters.minPrice) : null,
     maxPrice: filters.maxPrice ? Number(filters.maxPrice) : null,
     minRating: filters.minRating ? Number(filters.minRating) : null,
@@ -34,6 +35,10 @@ function toBrowse(
   }
 }
 
+function formatCount(n: number) {
+  return n.toLocaleString('en-US')
+}
+
 /** Customer product listing with advanced filters + load more. */
 export function ShopPage({ categorySlug }: { categorySlug?: string }) {
   const [params, setParams] = useSearchParams()
@@ -44,14 +49,31 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
   }))
   const [applied, setApplied] = useState(draft)
   const [products, setProducts] = useState<Product[]>([])
+  const [total, setTotal] = useState(0)
   const [nextStart, setNextStart] = useState<number | null>(null)
   const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [view, setView] = useState<'grid' | 'list'>('grid')
 
   const brandsQuery = useQuery({
     queryKey: ['brands'],
     queryFn: listDistinctBrands,
   })
+
+  const categoriesQuery = useQuery({
+    queryKey: ['categories'],
+    queryFn: listCategories,
+  })
+
+  const categoryPills = useMemo(() => {
+    const fromDb = (categoriesQuery.data ?? [])
+      .map((c) => ({
+        slug: (c.slug || c.name).toLowerCase(),
+        label: c.name,
+      }))
+      .filter((c) => c.slug)
+    return [{ slug: '', label: 'All Items' }, ...fromDb]
+  }, [categoriesQuery.data])
 
   const pageQuery = useQuery({
     queryKey: ['browse', categorySlug ?? 'all', applied],
@@ -63,6 +85,7 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
     setProducts(pageQuery.data.products)
     setHasMore(pageQuery.data.hasMore)
     setNextStart(pageQuery.data.nextStart)
+    setTotal(pageQuery.data.total)
   }, [pageQuery.data])
 
   const loadMore = async () => {
@@ -78,6 +101,7 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
       })
       setHasMore(page.hasMore)
       setNextStart(page.nextStart)
+      setTotal(page.total)
     } finally {
       setLoadingMore(false)
     }
@@ -91,40 +115,144 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
     setParams(next, { replace: true })
   }
 
+  const setSort = (sort: FilterState['sort']) => {
+    const next = { ...draft, sort }
+    setDraft(next)
+    setApplied(next)
+    const p = new URLSearchParams(params)
+    if (sort === 'newest') p.delete('sort')
+    else p.set('sort', sort)
+    setParams(p, { replace: true })
+  }
+
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <header className="mb-6">
-        <h1 className="font-[Syne] text-3xl font-extrabold tracking-tight">
-          {categorySlug
-            ? categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
-            : 'Shop'}
-        </h1>
-        <p className="mt-1 text-sm text-stone-500">
-          Browse live inventory from Styla shops.
-        </p>
+    <main className="mx-auto max-w-[1400px] px-3 py-6 sm:px-4">
+      <header className="mb-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="flex items-center gap-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Shop
+              <span className="inline-flex text-violet-500" aria-hidden>
+                <Sparkle className="h-6 w-6 -translate-y-1" />
+                <Sparkle className="h-4 w-4 translate-x-[-2px] translate-y-1" />
+              </span>
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Discover trendy styles from top brands.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-end gap-2">
+            {!pageQuery.isLoading && (
+              <p className="text-sm text-slate-500">
+                Showing {formatCount(products.length)}
+                {total > products.length
+                  ? ` of ${formatCount(total)}`
+                  : ''}{' '}
+                items
+              </p>
+            )}
+            <div className="flex items-center gap-2">
+              <label className="inline-flex items-center gap-1.5 rounded-xl border border-violet-200 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
+                <span className="text-slate-400">Sort by:</span>
+                <select
+                  className="bg-transparent font-semibold text-slate-800 outline-none"
+                  value={draft.sort}
+                  onChange={(e) => setSort(e.target.value as FilterState['sort'])}
+                >
+                  <option value="newest">Newest</option>
+                  <option value="price-asc">Price ↑</option>
+                  <option value="price-desc">Price ↓</option>
+                  <option value="rating">Top rated</option>
+                </select>
+              </label>
+              <div className="flex overflow-hidden rounded-xl border border-violet-200 bg-white shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setView('grid')}
+                  className={`grid h-10 w-10 place-items-center transition ${
+                    view === 'grid'
+                      ? 'bg-violet-600 text-white'
+                      : 'text-slate-500 hover:bg-violet-50'
+                  }`}
+                  aria-label="Grid view"
+                >
+                  <GridIcon />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setView('list')}
+                  className={`grid h-10 w-10 place-items-center transition ${
+                    view === 'list'
+                      ? 'bg-violet-600 text-white'
+                      : 'text-slate-500 hover:bg-violet-50'
+                  }`}
+                  aria-label="List view"
+                >
+                  <ListIcon />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav className="mt-5 flex gap-2 overflow-x-auto pb-1">
+          {categoryPills.map((pill) => {
+            const active =
+              (pill.slug === '' && !categorySlug) ||
+              pill.slug === categorySlug
+            const to = pill.slug
+              ? `/customer/categories/${pill.slug}`
+              : '/customer/shop'
+            return (
+              <Link
+                key={pill.slug || 'all'}
+                to={to}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition ${
+                  active
+                    ? 'border-violet-300 bg-violet-100 text-violet-700'
+                    : 'border-violet-100 bg-white text-slate-600 hover:border-violet-200 hover:bg-violet-50'
+                }`}
+              >
+                <CategoryIcon slug={pill.slug} />
+                {pill.label}
+              </Link>
+            )
+          })}
+        </nav>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <ProductFilters
-          value={draft}
-          brands={brandsQuery.data ?? []}
-          onChange={setDraft}
-          onApply={apply}
-          onReset={() => {
-            const blank = defaultFilters()
-            setDraft(blank)
-            setApplied(blank)
-            setParams({}, { replace: true })
-          }}
-        />
+      <div className="grid items-start gap-5 lg:grid-cols-[320px_1fr]">
+        <aside className="w-full self-start lg:sticky lg:top-24">
+          <ProductFilters
+            value={draft}
+            brands={brandsQuery.data ?? []}
+            onChange={setDraft}
+            onApply={apply}
+            onReset={() => {
+              const blank = defaultFilters()
+              setDraft(blank)
+              setApplied(blank)
+              setParams({}, { replace: true })
+            }}
+          />
+        </aside>
 
         <section>
           {pageQuery.isLoading && (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div
+              className={
+                view === 'grid'
+                  ? 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'
+                  : 'flex flex-col gap-3'
+              }
+            >
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-80 animate-pulse rounded-2xl bg-stone-200/80"
+                  className={`animate-pulse rounded-2xl bg-violet-100/70 ${
+                    view === 'grid' ? 'h-80' : 'h-36'
+                  }`}
                 />
               ))}
             </div>
@@ -137,9 +265,9 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
           )}
 
           {!pageQuery.isLoading && products.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center">
-              <p className="font-semibold">No products match</p>
-              <p className="mt-1 text-sm text-stone-500">
+            <div className="rounded-2xl border border-dashed border-violet-200 bg-white px-6 py-16 text-center">
+              <p className="font-semibold text-slate-800">No products match</p>
+              <p className="mt-1 text-sm text-slate-500">
                 Try clearing filters or ask a shop owner to add inventory.
               </p>
             </div>
@@ -147,12 +275,15 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
 
           {products.length > 0 && (
             <>
-              <p className="mb-4 text-sm text-stone-500">
-                Showing {products.length} item{products.length === 1 ? '' : 's'}
-              </p>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div
+                className={
+                  view === 'grid'
+                    ? 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'
+                    : 'flex flex-col gap-3'
+                }
+              >
                 {products.map((p) => (
-                  <CatalogProductCard key={p.id} product={p} />
+                  <CatalogProductCard key={p.id} product={p} layout={view} />
                 ))}
               </div>
               {hasMore && (
@@ -161,7 +292,7 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
                     type="button"
                     disabled={loadingMore}
                     onClick={() => void loadMore()}
-                    className="rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold hover:bg-stone-50 disabled:opacity-60"
+                    className="rounded-full border border-violet-200 bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 hover:bg-violet-50 disabled:opacity-60"
                   >
                     {loadingMore ? 'Loading…' : 'Load more'}
                   </button>
@@ -173,4 +304,126 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
       </div>
     </main>
   )
+}
+
+function Sparkle({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M12 2l1.2 6.3L19 9.5l-5.8 1.2L12 17l-1.2-6.3L5 9.5l5.8-1.2L12 2Z" />
+    </svg>
+  )
+}
+
+function GridIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </svg>
+  )
+}
+
+function ListIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden>
+      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function iconTypeForSlug(slug: string): 'grid' | 'dress' | 'shirt' | 'shoe' | 'bag' | 'tag' {
+  const s = slug.toLowerCase()
+  if (!s) return 'grid'
+  if (s.includes('dress') || s.includes('frock')) return 'dress'
+  if (s.includes('top') || s.includes('shirt') || s.includes('tee')) return 'shirt'
+  if (s.includes('shoe') || s.includes('sneaker') || s.includes('heel')) return 'shoe'
+  if (s.includes('bag') || s.includes('purse') || s.includes('handbag')) return 'bag'
+  return 'tag'
+}
+
+function CategoryIcon({ slug }: { slug: string }) {
+  const type = iconTypeForSlug(slug)
+  const common = {
+    width: 16,
+    height: 16,
+    viewBox: '0 0 24 24',
+    fill: 'none' as const,
+    'aria-hidden': true,
+  }
+  switch (type) {
+    case 'grid':
+      return (
+        <svg {...common} fill="currentColor">
+          <rect x="4" y="4" width="7" height="7" rx="1.5" />
+          <rect x="13" y="4" width="7" height="7" rx="1.5" />
+          <rect x="4" y="13" width="7" height="7" rx="1.5" />
+          <rect x="13" y="13" width="7" height="7" rx="1.5" />
+        </svg>
+      )
+    case 'dress':
+      return (
+        <svg {...common}>
+          <path
+            d="M9 3h6l1.5 4-2 1v3l4 10H5.5l4-10V8l-2-1L9 3Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )
+    case 'shirt':
+      return (
+        <svg {...common}>
+          <path
+            d="M8 5 12 7l4-2 3 2-2 3v9H7V10L5 7l3-2Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )
+    case 'shoe':
+      return (
+        <svg {...common}>
+          <path
+            d="M4 15c2-1 4-3 7-3 2 0 3 .5 5 2h4v2H4v-1Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <path d="M8 12c1-2 2-4 4-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      )
+    case 'bag':
+      return (
+        <svg {...common}>
+          <path
+            d="M6 8h12l-1 11H7L6 8Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9 8V7a3 3 0 0 1 6 0v1"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      )
+    case 'tag':
+      return (
+        <svg {...common}>
+          <path
+            d="M20 13 11 4H4v7l9 9 7-7Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" />
+        </svg>
+      )
+  }
 }

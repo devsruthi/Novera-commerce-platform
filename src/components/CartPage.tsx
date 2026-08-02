@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useOrders } from '../context/OrdersContext'
@@ -6,6 +7,13 @@ import { CART_EMPTY_VISUALS, CART_SUCCESS_VISUAL } from '../data/cartVisuals'
 import { formatMoney } from '../lib/catalogApi'
 import { getEffectiveStock } from '../lib/stockAlerts'
 import type { PaymentMethod } from '../types'
+
+type CartPageProps = {
+  /** When set, continue/browse actions navigate here instead of closing the AI cart overlay. */
+  continuePath?: string
+  /** When set, “View order” navigates here instead of opening the AI orders overlay. */
+  ordersPath?: string
+}
 
 const PAYMENT_OPTIONS: Array<{
   id: PaymentMethod
@@ -19,7 +27,8 @@ const PAYMENT_OPTIONS: Array<{
   { id: 'klarna', label: 'Klarna', hint: 'Pay in 3 interest-free', mark: 'Klarna' },
 ]
 
-export function CartPage() {
+export function CartPage({ continuePath, ordersPath }: CartPageProps = {}) {
+  const navigate = useNavigate()
   const {
     closeCart,
     items,
@@ -43,9 +52,21 @@ export function CartPage() {
   const shipProgress = Math.min(100, (subtotal / freeShipAt) * 100)
   const remainingForFree = Math.max(0, freeShipAt - subtotal)
 
+  const continueShopping = () => {
+    if (continuePath) {
+      navigate(continuePath)
+      return
+    }
+    closeCart()
+  }
+
   const onCheckout = () => {
     if (!user) {
-      openAuth('login')
+      if (continuePath) {
+        navigate('/auth/login')
+      } else {
+        openAuth('login')
+      }
       setError('Sign in to place an order.')
       return
     }
@@ -73,6 +94,10 @@ export function CartPage() {
   }
 
   const viewOrder = () => {
+    if (ordersPath) {
+      navigate(ordersPath)
+      return
+    }
     closeCart()
     openOrders()
   }
@@ -88,7 +113,7 @@ export function CartPage() {
       <div className="cart-page-inner">
         <header className="cart-hero">
           <div className="cart-hero-copy">
-            <button type="button" className="back-btn cart-back" onClick={closeCart}>
+            <button type="button" className="back-btn cart-back" onClick={continueShopping}>
               <span aria-hidden>←</span>
               Continue shopping
             </button>
@@ -140,7 +165,7 @@ export function CartPage() {
                 <button type="button" className="solid-btn" onClick={viewOrder}>
                   View order
                 </button>
-                <button type="button" className="ghost-btn" onClick={closeCart}>
+                <button type="button" className="ghost-btn" onClick={continueShopping}>
                   Keep exploring
                 </button>
               </div>
@@ -179,7 +204,7 @@ export function CartPage() {
                 Discover a look, choose your size, then add it here. We’ll hold
                 everything ready for a smooth checkout.
               </p>
-              <button type="button" className="solid-btn" onClick={closeCart}>
+              <button type="button" className="solid-btn" onClick={continueShopping}>
                 Browse products
               </button>
 

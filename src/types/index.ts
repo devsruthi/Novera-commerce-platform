@@ -68,11 +68,15 @@ export interface Product {
   rating: number
   reviewCount: number
   imageUrl: string
+  /** Full gallery when available; `imageUrl` is the primary/cover. */
+  images?: string[]
   productUrl?: string
   description: string
   inStock: boolean
   /** Units available when known; otherwise inferred client-side */
   stockCount?: number
+  featured?: boolean
+  createdAt?: string
   source: ProductSource
 }
 
@@ -136,6 +140,8 @@ export interface CatalogResponse {
   /** Offset to request for the next page (Load more) */
   nextStart?: number | null
   hasMore?: boolean
+  /** Exact match count when available from Supabase */
+  total?: number
 }
 
 export interface ChatMessage {

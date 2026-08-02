@@ -122,7 +122,7 @@ export function buildCatalogQuery(parts: {
 export function sourceLabel(source: ProductSource): string {
   switch (source) {
     case 'supabase':
-      return 'Styla Shop'
+      return 'Novera Shop'
     case 'ebay':
       return 'eBay'
     case 'bestbuy':
@@ -165,9 +165,13 @@ export function stockForSize(
   stockCount?: number,
 ): number {
   if (!inStock || stockCount === 0) return 0
-  const ceiling = typeof stockCount === 'number' ? Math.max(stockCount, 1) : 10
+  // Real inventory from Supabase — trust the count for every size.
+  if (typeof stockCount === 'number' && stockCount > 0) {
+    return stockCount
+  }
+  const ceiling = 10
   const n = hashSeed(`${productId}:${size}`) % (ceiling + 2)
-  // Some sizes sell out while others remain
+  // Some sizes sell out while others remain (demo catalogs without stock)
   return Math.min(n, ceiling)
 }
 

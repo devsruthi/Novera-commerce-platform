@@ -73,7 +73,7 @@ export function LandingSections() {
             AI makes <em>fashion simple</em>
           </h2>
           <p>
-            From natural-language search to ranked recommendations — Styla keeps
+            From natural-language search to ranked recommendations — Novera keeps
             discovery fast, clear, and personal.
           </p>
         </div>

@@ -73,7 +73,7 @@
 }
 
 .brand-name {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.15rem;
   letter-spacing: -0.03em;
@@ -321,7 +321,7 @@
 }
 
 .hero h1 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 600;
   font-size: clamp(2.4rem, 5.4vw, 4.1rem);
   letter-spacing: -0.03em;
@@ -562,7 +562,7 @@
 }
 
 .brand-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -591,7 +591,7 @@
 
 .features-intro h2 {
   margin: 0 0 0.85rem;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.15;
   color: var(--text);
@@ -830,7 +830,7 @@
 
 .feature-panel-head h2 {
   margin: 0 0 0.35rem;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 1.45rem;
 }
 
@@ -1084,7 +1084,7 @@
 
 .assistant-panel-head h2 {
   margin: 0 0 0.25rem;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 1.45rem;
 }
 
@@ -1309,7 +1309,7 @@
 
 .results-toolbar h2 {
   margin: 0;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 1.35rem;
   letter-spacing: -0.03em;
 }
@@ -1527,7 +1527,7 @@
 
 .product-name {
   margin: 0;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 1.05rem;
   font-weight: 650;
   letter-spacing: -0.02em;
@@ -1555,6 +1555,11 @@
   margin-left: auto;
   font-size: 0.8rem;
   color: var(--ink-soft);
+}
+
+.rating .rating-star,
+.rating-star {
+  color: var(--rating-gold);
 }
 
 .why-summary {
@@ -1878,7 +1883,7 @@
 
 .wishlist-page-header h1 {
   margin: 0.65rem 0 0.2rem;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   letter-spacing: -0.03em;
   font-size: clamp(1.6rem, 3vw, 2.1rem);
 }
@@ -2049,7 +2054,7 @@
 
 .cart-hero h1 {
   margin: 0;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: clamp(2rem, 4vw, 2.8rem);
   letter-spacing: -0.03em;
   line-height: 1.05;
@@ -2174,7 +2179,7 @@
 
 .cart-checkout-head h2 {
   margin: 0;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 1.2rem;
   letter-spacing: -0.02em;
 }
@@ -2724,7 +2729,7 @@
 .cart-success-title {
   margin: 0;
   font-size: 1.35rem;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 700;
   color: var(--text);
 }
@@ -2779,7 +2784,7 @@
 
 .orders-page-header h1 {
   margin: 0.65rem 0 0.2rem;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   letter-spacing: -0.03em;
   font-size: clamp(1.7rem, 3vw, 2.3rem);
 }
@@ -3210,7 +3215,7 @@
 
 .modal h2 {
   margin: 0 0 0.5rem;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   letter-spacing: -0.03em;
 }
 
@@ -3290,7 +3295,7 @@
 
 .product-detail-body h2 {
   margin: 0 0 0.75rem;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: clamp(1.4rem, 3vw, 1.9rem);
   line-height: 1.2;
 }
@@ -3683,6 +3688,21 @@
 
 .signup-card {
   animation: signup-card-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+@keyframes home-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.home-hero-image {
+  animation: home-hero-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
 @media (prefers-reduced-motion: reduce) {

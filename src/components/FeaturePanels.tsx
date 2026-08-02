@@ -240,7 +240,8 @@ function ComparePanel({
                 <td>Rating</td>
                 {selected.map((item) => (
                   <td key={item.product.id}>
-                    {item.product.rating.toFixed(1)}★ ({item.product.reviewCount})
+                    {item.product.rating.toFixed(1)}
+                    <span className="rating-star">★</span> ({item.product.reviewCount})
                   </td>
                 ))}
               </tr>
@@ -310,7 +311,7 @@ function AssistantPanel({
           aria-hidden
         />
         <div>
-          <p className="assistant-kicker">Styla</p>
+          <p className="assistant-kicker">Novera</p>
           <h2>AI Assistant</h2>
           <p>Chat to refine filters — results update underneath.</p>
         </div>
@@ -370,7 +371,7 @@ function AssistantPanel({
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Tell me how to refine the list…"
               disabled={busy}
-              aria-label="Message Styla assistant"
+              aria-label="Message Novera assistant"
             />
             <button
               type="submit"
@@ -402,7 +403,10 @@ function ReviewsPanel({
 
       <div className="review-stats">
         <div>
-          <strong>{summary.avgRating.toFixed(1)}★</strong>
+          <strong>
+            {summary.avgRating.toFixed(1)}
+            <span className="rating-star">★</span>
+          </strong>
           <span>Avg rating</span>
         </div>
         <div>

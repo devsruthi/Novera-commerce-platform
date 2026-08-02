@@ -12,7 +12,7 @@ import { CategoriesPage } from '../features/customer/CategoriesPage'
 import { ProductDetailPage } from '../features/customer/ProductDetailPage'
 import { CustomerWishlistPage } from '../features/customer/CustomerWishlistPage'
 import { CustomerCartPage } from '../features/customer/CustomerCartPage'
-import { AiDiscoverPage } from '../features/ai/AiDiscoverPage'
+import { CustomerOrdersPage } from '../features/customer/CustomerOrdersPage'
 import { ShopLayout } from '../features/shop/ShopLayout'
 import { ShopDashboardPage } from '../features/shop/ShopDashboardPage'
 import { ShopProductsPage } from '../features/shop/ShopProductsPage'
@@ -46,8 +46,8 @@ export function AppRouter() {
           <Route path="product/:id" element={<ProductDetailPage />} />
           <Route path="wishlist" element={<CustomerWishlistPage />} />
           <Route path="cart" element={<CustomerCartPage />} />
+          <Route path="orders" element={<CustomerOrdersPage />} />
         </Route>
-        <Route path="/customer/ai" element={<AiDiscoverPage />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={['shop_owner']} />}>

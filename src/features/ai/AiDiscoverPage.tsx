@@ -62,7 +62,7 @@ function AiShoppingAssistant() {
                   Find your perfect outfit <span className="hero-ai">with AI</span>
                 </h1>
                 <p className="hero-sub">
-                  Describe the look in plain language. Styla parses intent, searches
+                  Describe the look in plain language. Novera parses intent, searches
                   your Supabase catalog, ranks matches, and explains every pick.
                 </p>
                 <SearchBar />

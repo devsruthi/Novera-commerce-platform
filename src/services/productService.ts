@@ -42,6 +42,16 @@ function asColors(values: string[] | null | undefined): Color[] {
     .filter((c): c is Color => allowed.has(c))
 }
 
+/**
+ * Prefer sharper follow-up shots as the cover when a product has multiple images.
+ * The first upload is often a soft preview; later gallery shots are clearer.
+ */
+export function orderProductImages(images: string[] | null | undefined): string[] {
+  const list = (images ?? []).filter(Boolean)
+  if (list.length <= 1) return list
+  return [...list.slice(1), list[0]]
+}
+
 /** Map a Supabase product row into the app Product shape used by AI/rankers. */
 export function mapDbProduct(row: DbProduct): Product {
   const price = Number(row.discount_price ?? row.price)
@@ -49,11 +59,12 @@ export function mapDbProduct(row: DbProduct): Product {
     row.discount_price != null && Number(row.discount_price) < Number(row.price)
       ? Number(row.price)
       : undefined
+  const images = orderProductImages(row.images)
 
   return {
     id: row.id,
     name: row.title,
-    brand: row.brand || row.shops?.shop_name || 'Styla',
+    brand: row.brand || row.shops?.shop_name || 'Novera',
     category: asCategory(row.categories?.slug ?? row.categories?.name),
     colors: asColors(row.colors),
     price,
@@ -64,10 +75,13 @@ export function mapDbProduct(row: DbProduct): Product {
     sizes: row.sizes?.length ? row.sizes : ['One size'],
     rating: Number(row.rating) || 0,
     reviewCount: 0,
-    imageUrl: row.images?.[0] || '',
+    imageUrl: images[0] || '',
+    images,
     description: row.description || row.title,
     inStock: row.stock > 0,
     stockCount: row.stock,
+    featured: Boolean(row.featured),
+    createdAt: row.created_at,
     source: 'supabase',
   }
 }
@@ -144,6 +158,7 @@ export async function searchProducts(
         : 'Catalog powered by Supabase — local shop inventory.',
     hasMore,
     nextStart: hasMore ? nextStart : null,
+    total,
   }
 }
 
@@ -246,7 +261,7 @@ export async function browseProducts(filters: BrowseFilters = {}): Promise<{
     products,
     hasMore: Boolean(page.hasMore),
     nextStart: page.nextStart ?? null,
-    total: products.length + (page.hasMore ? 1 : 0),
+    total: page.total ?? products.length,
   }
 }
 

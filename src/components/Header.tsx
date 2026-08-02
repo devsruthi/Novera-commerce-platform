@@ -90,7 +90,7 @@ export function Header() {
               height={25}
               aria-hidden
             />
-            <span className="brand-name">Styla</span>
+            <span className="brand-name">Novera</span>
           </a>
         </div>
 
