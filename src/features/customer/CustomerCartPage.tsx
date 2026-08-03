@@ -79,7 +79,7 @@ export function CustomerCartPage() {
 
   if (orderId) {
     return (
-      <main className="relative mx-auto max-w-2xl px-4 py-12">
+      <main className="page-x relative mx-auto max-w-2xl py-12">
         <div className="overflow-hidden rounded-3xl border border-violet-100 bg-white shadow-xl shadow-violet-200/40">
           <div className="relative h-44 overflow-hidden bg-violet-100">
             <img
@@ -125,7 +125,7 @@ export function CustomerCartPage() {
 
   if (items.length === 0) {
     return (
-      <main className="relative mx-auto max-w-3xl px-4 py-10">
+      <main className="page-x relative mx-auto max-w-3xl py-10">
         <div className="overflow-hidden rounded-3xl border border-violet-100 bg-white shadow-lg shadow-violet-100/50">
           <div className="grid sm:grid-cols-[1.1fr_1fr]">
             <div className="relative min-h-[220px] bg-violet-100 sm:min-h-[320px]">
@@ -161,7 +161,7 @@ export function CustomerCartPage() {
   }
 
   return (
-    <main className="relative mx-auto max-w-[1400px] px-3 py-6 sm:px-4">
+    <main className="page-shell page-x relative py-6">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72"

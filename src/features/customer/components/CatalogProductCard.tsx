@@ -1,5 +1,5 @@
 import { useEffect, useState, type MouseEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { Product } from '../../../types'
 import { formatMoney } from '../../../lib/catalogApi'
 import { resolveSizes } from '../../../lib/inferProduct'
@@ -43,6 +43,7 @@ export function CatalogProductCard({
   product: Product
   layout?: 'grid' | 'list'
 }) {
+  const navigate = useNavigate()
   const { isWished, toggle } = useWishlist()
   const { items, addToCart, removeItem, showSnackbar } = useCart()
   const wished = isWished(product.id)
@@ -55,6 +56,15 @@ export function CatalogProductCard({
   const [pauseSlide, setPauseSlide] = useState(false)
   const badge = badgeFor(product)
   const activeImage = gallery[imgIndex] || product.imageUrl
+  const detailPath = `/customer/product/${product.id}`
+
+  const goToDetails = () => navigate(detailPath)
+
+  const onWishlistClick = (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggle(product)
+  }
 
   useEffect(() => {
     setImgIndex(0)
@@ -74,7 +84,7 @@ export function CatalogProductCard({
 
     if (isInBag) {
       for (const item of inBag) removeItem(item.key)
-      showSnackbar(`Removed ${product.name} from bag`)
+      showSnackbar(`Removed ${product.name} from cart`)
       return
     }
 
@@ -95,9 +105,9 @@ export function CatalogProductCard({
 
     const result = addToCart(product, size, 1)
     if (result.ok) {
-      showSnackbar(`Added ${product.name} to bag`)
+      showSnackbar(`Added ${product.name} to cart`)
     } else {
-      showSnackbar(result.error ?? 'Could not add to bag')
+      showSnackbar(result.error ?? 'Could not add to cart')
     }
   }
 
@@ -137,7 +147,7 @@ export function CatalogProductCard({
     return (
       <article className="flex gap-4 overflow-hidden rounded-2xl border border-violet-100 bg-white p-3 shadow-sm shadow-violet-100/40">
         <Link
-          to={`/customer/product/${product.id}`}
+          to={detailPath}
           className="relative h-36 w-32 shrink-0 overflow-hidden rounded-xl bg-violet-50/70"
         >
           {activeImage ? (
@@ -148,12 +158,12 @@ export function CatalogProductCard({
         </Link>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start justify-between gap-2">
-            <Link to={`/customer/product/${product.id}`} className="min-w-0">
+            <Link to={detailPath} className="min-w-0">
               {body}
             </Link>
             <button
               type="button"
-              onClick={() => toggle(product)}
+              onClick={onWishlistClick}
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border border-violet-100 bg-white ${
                 wished ? 'text-rose-500' : 'text-slate-400'
               }`}
@@ -169,7 +179,7 @@ export function CatalogProductCard({
             className={`mt-auto ${bagButtonClass}`}
           >
             <BagIcon />
-            {isInBag ? 'Remove from bag' : 'Add to bag'}
+            {isInBag ? 'Remove from cart' : 'Add to cart'}
           </button>
         </div>
       </article>
@@ -180,35 +190,48 @@ export function CatalogProductCard({
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm shadow-violet-100/50 transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-md hover:shadow-violet-200/50">
       <div className="p-[5px]">
         <div
-          className="relative aspect-[4/5] overflow-hidden rounded-[14px] bg-gradient-to-b from-violet-50/80 to-slate-50"
+          role="link"
+          tabIndex={0}
+          onClick={goToDetails}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              goToDetails()
+            }
+          }}
+          className="relative aspect-[4/5] cursor-pointer overflow-hidden rounded-[14px] bg-gradient-to-b from-violet-50/80 to-slate-50"
           onMouseEnter={() => setPauseSlide(true)}
           onMouseLeave={() => setPauseSlide(false)}
         >
-          <Link to={`/customer/product/${product.id}`} className="relative block h-full">
-            {gallery.length > 0 ? (
-              gallery.map((src, i) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt=""
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  className={`absolute inset-0 h-full w-full object-contain p-3 transition-all duration-700 ease-out group-hover:scale-[1.02] ${
-                    i === imgIndex
-                      ? 'z-[1] translate-x-0 scale-100 opacity-100'
-                      : 'z-0 translate-x-3 scale-[0.98] opacity-0'
-                  }`}
-                />
-              ))
-            ) : (
-              <div className="grid h-full place-items-center text-sm text-stone-400">
-                No image
-              </div>
-            )}
-          </Link>
+          {gallery.length > 0 ? (
+            gallery.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                loading={i === 0 ? 'eager' : 'lazy'}
+                className={`absolute inset-0 h-full w-full object-contain p-3 transition-all duration-700 ease-out group-hover:scale-[1.02] ${
+                  i === imgIndex
+                    ? 'z-[1] translate-x-0 scale-100 opacity-100'
+                    : 'z-0 translate-x-3 scale-[0.98] opacity-0'
+                }`}
+              />
+            ))
+          ) : (
+            <div className="grid h-full place-items-center text-sm text-stone-400">
+              No image
+            </div>
+          )}
+
+          <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center bg-slate-900/0 opacity-0 transition duration-300 group-hover:bg-slate-900/25 group-hover:opacity-100">
+            <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-violet-700 shadow-md">
+              Click to view
+            </span>
+          </div>
 
           {badge && (
             <span
-              className={`pointer-events-none absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-bold ${badge.className}`}
+              className={`pointer-events-none absolute left-3 top-3 z-20 rounded-full px-2.5 py-1 text-[11px] font-bold ${badge.className}`}
             >
               {badge.label}
             </span>
@@ -216,13 +239,10 @@ export function CatalogProductCard({
 
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              toggle(product)
-            }}
-            className={`absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/95 shadow-sm ${
-              wished ? 'text-rose-500' : 'text-slate-400'
+            onClick={onWishlistClick}
+            onMouseDown={(e) => e.stopPropagation()}
+            className={`absolute right-3 top-3 z-20 grid h-9 w-9 place-items-center rounded-full bg-white/95 shadow-sm transition hover:scale-105 ${
+              wished ? 'text-rose-500' : 'text-slate-400 hover:text-rose-400'
             }`}
             aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
           >
@@ -230,7 +250,7 @@ export function CatalogProductCard({
           </button>
 
           {gallery.length > 1 && (
-            <div className="absolute bottom-3 left-0 right-0 z-10 flex justify-center gap-1.5">
+            <div className="absolute bottom-3 left-0 right-0 z-20 flex justify-center gap-1.5">
               {gallery.map((_, i) => (
                 <button
                   key={i}
@@ -240,6 +260,7 @@ export function CatalogProductCard({
                     e.stopPropagation()
                     setImgIndex(i)
                   }}
+                  onMouseDown={(e) => e.stopPropagation()}
                   className={`rounded-full transition-all duration-500 ease-out ${
                     i === imgIndex
                       ? 'h-1.5 w-4 bg-violet-600'
@@ -254,7 +275,7 @@ export function CatalogProductCard({
       </div>
 
       <div className="flex flex-1 flex-col p-3.5">
-        <Link to={`/customer/product/${product.id}`}>{body}</Link>
+        <Link to={detailPath}>{body}</Link>
         <button
           type="button"
           disabled={!isInBag && !product.inStock}
@@ -262,7 +283,7 @@ export function CatalogProductCard({
           className={`mt-3 ${bagButtonClass}`}
         >
           <BagIcon />
-          {isInBag ? 'Remove from bag' : 'Add to bag'}
+          {isInBag ? 'Remove from cart' : 'Add to cart'}
         </button>
       </div>
     </article>

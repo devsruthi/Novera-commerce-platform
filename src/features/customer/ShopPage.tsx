@@ -126,7 +126,7 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-[1400px] px-3 py-6 sm:px-4">
+    <main className="page-shell page-x py-6">
       <header className="mb-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">

@@ -105,7 +105,7 @@ function CustomerHeader() {
   return (
     <>
       <header className="sticky top-0 z-20 border-b border-violet-100/80 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-3 py-2.5 sm:px-4">
+        <div className="page-shell page-x flex flex-wrap items-center justify-between gap-3 py-2.5">
           <Link to="/customer" className="inline-flex items-center gap-2">
             <img
               src="/novera-icon.png"

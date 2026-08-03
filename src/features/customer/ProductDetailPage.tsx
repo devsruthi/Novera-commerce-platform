@@ -39,7 +39,7 @@ export function ProductDetailPage() {
 
   if (productQuery.isLoading) {
     return (
-      <main className="relative mx-auto max-w-[1400px] px-3 py-10 sm:px-4">
+      <main className="page-shell page-x relative py-10">
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="aspect-[4/5] animate-pulse rounded-3xl bg-violet-100/80" />
           <div className="space-y-4 pt-4">
@@ -55,7 +55,7 @@ export function ProductDetailPage() {
 
   if (!product) {
     return (
-      <main className="mx-auto max-w-[1400px] px-3 py-16 text-center sm:px-4">
+      <main className="page-shell page-x py-16 text-center">
         <p className="font-semibold text-slate-800">Product not found</p>
         <Link
           to="/customer/shop"
@@ -82,7 +82,7 @@ export function ProductDetailPage() {
   const onAdd = () => {
     if (isInBag) {
       for (const item of inBag) removeItem(item.key)
-      showSnackbar(`Removed ${product.name} from bag`)
+      showSnackbar(`Removed ${product.name} from cart`)
       return
     }
     const result = addToCart(product, chosenSize, qty)
@@ -90,7 +90,7 @@ export function ProductDetailPage() {
       showSnackbar(result.error ?? 'Could not add to cart')
       return
     }
-    showSnackbar('Added to bag')
+    showSnackbar('Added to cart')
   }
 
   return (
@@ -108,7 +108,7 @@ export function ProductDetailPage() {
         className="pointer-events-none absolute -right-20 top-24 h-72 w-72 rounded-full bg-violet-300/20 blur-3xl"
       />
 
-      <div className="relative mx-auto max-w-[1400px] px-3 py-6 sm:px-4">
+      <div className="page-shell page-x relative py-6">
         <Link
           to="/customer/shop"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition hover:text-violet-700"
@@ -296,7 +296,7 @@ export function ProductDetailPage() {
                 }`}
               >
                 <BagIcon />
-                {isInBag ? 'Remove from bag' : 'Add to bag'}
+                {isInBag ? 'Remove from cart' : 'Add to cart'}
               </button>
               <button
                 type="button"

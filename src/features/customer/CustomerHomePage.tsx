@@ -1,10 +1,33 @@
+import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { listCategories, listFeaturedProducts } from '../../services/productService'
 import { CatalogProductCard } from './components/CatalogProductCard'
 
+/** Soft lavender / fashion visuals that match the Novera home theme. */
+const HERO_IMAGES = [
+  '/auth/login-bag.jpg',
+  '/auth/login-shades.jpg',
+  '/auth/login-shop.jpg',
+]
+
+const heroMaskStyle = {
+  maskImage: [
+    'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
+    'linear-gradient(to bottom, transparent 0%, black 8%, black 72%, transparent 100%)',
+  ].join(', '),
+  WebkitMaskImage: [
+    'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
+    'linear-gradient(to bottom, transparent 0%, black 8%, black 72%, transparent 100%)',
+  ].join(', '),
+  maskComposite: 'intersect' as const,
+  WebkitMaskComposite: 'source-in',
+}
+
 /** Customer home — Novera hero, categories, featured products. */
 export function CustomerHomePage() {
+  const [heroIndex, setHeroIndex] = useState(0)
+
   const featured = useQuery({
     queryKey: ['featured-products'],
     queryFn: () => listFeaturedProducts(8),
@@ -13,6 +36,13 @@ export function CustomerHomePage() {
     queryKey: ['categories'],
     queryFn: listCategories,
   })
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setHeroIndex((i) => (i + 1) % HERO_IMAGES.length)
+    }, 4200)
+    return () => window.clearInterval(id)
+  }, [])
 
   return (
     <main className="relative overflow-hidden text-slate-900">
@@ -35,7 +65,7 @@ export function CustomerHomePage() {
       />
 
       {/* Hero — brand, headline, one line, CTAs, full-bleed visual */}
-      <section className="relative mx-auto grid min-h-[min(78vh,640px)] max-w-[1400px] items-center gap-8 px-3 pb-10 pt-8 sm:px-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-6 lg:pb-14 lg:pt-6">
+      <section className="page-shell page-x relative grid items-center gap-6 pb-4 pt-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-6 lg:pb-5 lg:pt-5">
         <div className="relative z-10 max-w-xl">
           <div className="mb-5 inline-flex items-center gap-2.5">
             <img
@@ -81,27 +111,40 @@ export function CustomerHomePage() {
             aria-hidden
             className="absolute inset-x-8 bottom-4 h-24 rounded-full bg-violet-400/30 blur-3xl"
           />
-          <img
-            src="/auth/login-hero.jpg"
-            alt=""
-            className="home-hero-image relative mx-auto h-[min(58vh,520px)] w-auto max-w-full object-cover object-top lg:h-[min(64vh,560px)]"
-            style={{
-              maskImage: [
-                'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
-                'linear-gradient(to bottom, transparent 0%, black 8%, black 72%, transparent 100%)',
-              ].join(', '),
-              WebkitMaskImage: [
-                'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
-                'linear-gradient(to bottom, transparent 0%, black 8%, black 72%, transparent 100%)',
-              ].join(', '),
-              maskComposite: 'intersect',
-              WebkitMaskComposite: 'source-in',
-            }}
-          />
+          <div className="relative mx-auto h-[min(48vh,420px)] w-full max-w-[420px] lg:h-[min(52vh,460px)]">
+            {HERO_IMAGES.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                className={`home-hero-image absolute inset-0 m-auto h-full w-auto max-w-full object-cover object-center transition-all duration-1000 ease-out ${
+                  i === heroIndex
+                    ? 'scale-100 opacity-100'
+                    : 'scale-[1.03] opacity-0'
+                }`}
+                style={heroMaskStyle}
+              />
+            ))}
+          </div>
+          <div className="mt-3 flex justify-center gap-1.5">
+            {HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Hero image ${i + 1}`}
+                onClick={() => setHeroIndex(i)}
+                className={`rounded-full transition-all duration-500 ${
+                  i === heroIndex
+                    ? 'h-1.5 w-5 bg-violet-600'
+                    : 'h-1.5 w-1.5 bg-violet-300/70 hover:bg-violet-400'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto max-w-[1400px] px-3 pb-14 sm:px-4">
+      <div className="page-shell page-x relative z-10 pb-14">
         {/* Categories */}
         <section>
           <div className="mb-4 flex items-end justify-between gap-3">

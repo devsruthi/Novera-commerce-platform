@@ -36,7 +36,7 @@ export function CustomerWishlistPage() {
   }
 
   return (
-    <main className="mx-auto max-w-[1400px] px-3 py-6 sm:px-4">
+    <main className="page-shell page-x py-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
@@ -157,7 +157,7 @@ export function CustomerWishlistPage() {
                   <button
                     type="button"
                     onClick={() => remove(product.id)}
-                    className="w-full rounded-xl border border-violet-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                    className="w-full rounded-xl border border-rose-500 bg-white px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 hover:border-rose-600 hover:text-rose-700"
                   >
                     Delete
                   </button>

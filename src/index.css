@@ -75,6 +75,32 @@ a {
   color: var(--rating-gold);
 }
 
+/* Global horizontal page padding — keep consistent across all shells */
+.page-x {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .page-x {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-x {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.page-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1400px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

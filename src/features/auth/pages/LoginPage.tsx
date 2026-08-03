@@ -42,7 +42,7 @@ const FEATURES = [
   },
 ]
 
-/** Single-viewport Novera login — gradient backdrop + overlapping hero. */
+/** Single-viewport Novera login — soft solid backdrop + overlapping hero. */
 export function LoginPage() {
   const { login, user, loading, configured } = useAuth()
   const navigate = useNavigate()
@@ -97,45 +97,10 @@ export function LoginPage() {
 
   return (
     <div className="relative h-dvh overflow-hidden text-slate-900">
-      {/* Soft lavender base + wave gradient backdrop */}
+      <div aria-hidden className="absolute inset-0 bg-[#f7f3ff]" />
       <div
         aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(135deg, #efe8ff 0%, #f7f3ff 38%, #ffffff 68%, #f3eeff 100%)',
-        }}
-      />
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <defs>
-          <linearGradient id="loginWave" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#d8c8ff" stopOpacity="0.85" />
-            <stop offset="45%" stopColor="#e9deff" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.15" />
-          </linearGradient>
-        </defs>
-        <path
-          fill="url(#loginWave)"
-          d="M0 0h980C820 180 760 260 700 420c-70 180-40 300 80 480H0V0z"
-        />
-        <path
-          fill="#cbb6ff"
-          fillOpacity="0.22"
-          d="M0 0c420 40 620 160 720 340S820 760 980 900H0V0z"
-        />
-      </svg>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-20 top-10 h-[420px] w-[420px] rounded-full bg-violet-300/25 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-80px] left-[20%] h-[280px] w-[380px] rounded-full bg-fuchsia-200/20 blur-3xl"
+        className="pointer-events-none absolute inset-y-0 left-0 w-[42%] bg-[#efe8ff]"
       />
 
       {/* Center hero — soft-edged, sits between copy and login card */}
@@ -165,7 +130,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      <div className="relative z-20 mx-auto flex h-full max-w-[1280px] items-center px-5 sm:px-8 lg:px-12">
+      <div className="page-x relative z-20 mx-auto flex h-full max-w-[1280px] items-center">
         <div className="grid h-full w-full items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,400px)] lg:gap-16 xl:gap-24">
           {/* Left marketing panel */}
           <section className="relative z-20 flex max-w-xl flex-col justify-center gap-4 py-4 lg:py-0">
@@ -229,8 +194,8 @@ export function LoginPage() {
                       <div
                         className={`absolute inset-0 ${
                           active
-                            ? 'bg-gradient-to-r from-violet-700/90 via-violet-600/80 to-violet-500/55'
-                            : 'bg-gradient-to-r from-slate-900/55 via-slate-900/35 to-violet-900/20'
+                            ? 'bg-violet-700/85'
+                            : 'bg-slate-900/50'
                         }`}
                       />
                     </div>
@@ -269,7 +234,7 @@ export function LoginPage() {
                           alt=""
                           className="h-full w-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/55 via-slate-900/10 to-transparent" />
+                        <div className="absolute inset-0 bg-slate-900/25" />
                         <span
                           className={`absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide !text-white shadow-sm ${
                             item.badge === 'Shop'
@@ -340,6 +305,11 @@ export function LoginPage() {
           {/* Login card */}
           <section className="relative z-30 flex items-center justify-center py-3 lg:justify-end lg:py-0">
             <div className="relative w-full max-w-[400px] rounded-[1.75rem] border border-white/90 bg-white p-6 shadow-[0_24px_60px_-20px_rgba(91,56,190,0.28)] sm:p-7">
+              <div
+                aria-hidden
+                className="absolute inset-x-8 top-0 h-1 rounded-b-full bg-violet-600"
+              />
+
               <div className="flex items-center gap-2.5">
                 <img
                   src="/novera-icon.png"
@@ -454,7 +424,7 @@ export function LoginPage() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="relative flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-sm font-semibold !text-white shadow-lg shadow-violet-600/30 transition hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-60"
+                  className="relative flex w-full items-center justify-center rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold !text-white shadow-lg shadow-violet-600/30 transition hover:bg-violet-700 disabled:opacity-60"
                 >
                   <span>{busy ? 'Signing in…' : 'Sign In'}</span>
                   {!busy && (
@@ -471,7 +441,7 @@ export function LoginPage() {
                 New here?{' '}
                 <Link
                   to="/auth/signup"
-                  className="font-semibold text-violet-600 hover:text-violet-800"
+                  className="font-semibold !text-[var(--primary)] hover:!text-[var(--primary-deep)]"
                 >
                   Create an account
                 </Link>

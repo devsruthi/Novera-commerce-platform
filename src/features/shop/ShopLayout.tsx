@@ -346,7 +346,7 @@ export function ShopLayout() {
         )}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur sm:gap-4 sm:px-6">
+          <header className="page-x sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200/80 bg-white/90 backdrop-blur sm:gap-4">
             <button
               type="button"
               className="rounded-xl p-2 text-slate-600 transition hover:bg-slate-50 lg:hidden"
@@ -403,7 +403,7 @@ export function ShopLayout() {
             </div>
           </header>
 
-          <main className="flex-1 p-6 lg:p-8">
+          <main className="page-x flex-1 py-6 lg:py-8">
             <Outlet />
           </main>
         </div>

@@ -99,14 +99,7 @@ export function SignupPage() {
 
   return (
     <div className="relative h-dvh overflow-hidden text-slate-900">
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(145deg, #f3e8ff 0%, #efe8ff 28%, #ffffff 62%, #fdf4ff 100%)',
-        }}
-      />
+      <div aria-hidden className="absolute inset-0 bg-[#faf8ff]" />
       <svg
         aria-hidden
         className="pointer-events-none absolute inset-0 h-full w-full"
@@ -114,60 +107,39 @@ export function SignupPage() {
         preserveAspectRatio="xMidYMid slice"
       >
         <defs>
-          <linearGradient id="signupWave" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e0cfff" stopOpacity="0.9" />
-            <stop offset="50%" stopColor="#f5e8ff" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
+          <linearGradient id="signupWaveA" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ddd6fe" stopOpacity="0.95" />
+            <stop offset="55%" stopColor="#ede9fe" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#faf8ff" stopOpacity="0.1" />
+          </linearGradient>
+          <linearGradient id="signupWaveB" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.45" />
+            <stop offset="50%" stopColor="#e9d5ff" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#f5f3ff" stopOpacity="0.05" />
           </linearGradient>
         </defs>
         <path
-          fill="url(#signupWave)"
-          d="M0 0h980C820 180 760 260 700 420c-70 180-40 300 80 480H0V0z"
+          fill="url(#signupWaveA)"
+          d="M0 0h920C780 140 720 240 680 400c-55 210-10 340 140 500H0V0z"
         />
         <path
-          fill="#d8b4fe"
-          fillOpacity="0.18"
-          d="M0 0c420 40 620 160 720 340S820 760 980 900H0V0z"
+          fill="url(#signupWaveB)"
+          d="M1440 900H520c140-120 210-240 250-400 45-180 20-320-90-500h760v900z"
+        />
+        <path
+          fill="#a78bfa"
+          fillOpacity="0.12"
+          d="M0 620c180-40 320-20 480 40s300 80 420 40c140-45 280-30 420 20v180H0V620z"
+        />
+        <path
+          fill="#8b5cf6"
+          fillOpacity="0.08"
+          d="M0 720c200-50 360-30 520 30s310 70 460 20c130-40 280-20 460 40v90H0V720z"
         />
       </svg>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-16 top-16 h-[380px] w-[380px] rounded-full bg-fuchsia-300/20 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-60px] left-[15%] h-[260px] w-[360px] rounded-full bg-violet-300/25 blur-3xl"
-      />
 
-      {/* Hero */}
-      <div className="pointer-events-none absolute inset-y-0 left-[50%] z-10 hidden w-[min(44vw,420px)] -translate-x-1/2 lg:block xl:left-[52%]">
-        <div className="relative mx-auto h-full w-full max-w-[400px]">
-          <div
-            aria-hidden
-            className="absolute inset-x-4 bottom-[10%] h-32 rounded-full bg-fuchsia-400/20 blur-3xl"
-          />
-          <img
-            src="/auth/login-hero.jpg"
-            alt=""
-            className="absolute bottom-[-2vh] left-1/2 h-[min(86vh,740px)] w-auto max-w-none -translate-x-1/2 scale-110 object-cover object-top"
-            style={{
-              maskImage: [
-                'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
-                'linear-gradient(to bottom, transparent 0%, black 6%, black 48%, transparent 92%)',
-              ].join(', '),
-              WebkitMaskImage: [
-                'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
-                'linear-gradient(to bottom, transparent 0%, black 6%, black 48%, transparent 92%)',
-              ].join(', '),
-              maskComposite: 'intersect',
-              WebkitMaskComposite: 'source-in',
-            }}
-          />
-        </div>
-      </div>
-
-      <div className="relative z-20 mx-auto flex h-full max-w-[1400px] items-center px-5 sm:px-8 lg:px-10 xl:px-12">
-        <div className="grid h-full w-full items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(480px,580px)] lg:gap-10 xl:gap-14">
+      <div className="page-shell page-x relative z-20 flex h-full items-center">
+        <div className="grid h-full w-full items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(400px,460px)] lg:gap-10 xl:gap-14">
           {/* Left marketing */}
           <section className="relative z-20 flex max-w-xl flex-col justify-center gap-4 py-4 lg:py-0">
             <Link to="/" className="relative z-10 inline-flex w-fit items-center gap-2.5">
@@ -231,7 +203,7 @@ export function SignupPage() {
                           alt=""
                           className="h-full w-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/15 to-transparent" />
+                        <div className="absolute inset-0 bg-slate-900/25" />
                         <span
                           className={`absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide !text-white shadow-sm ${
                             item.badge === 'Shop'
@@ -301,10 +273,10 @@ export function SignupPage() {
 
           {/* Signup card */}
           <section className="relative z-30 flex items-center justify-center py-3 lg:justify-end lg:py-0">
-            <div className="signup-card relative w-full max-w-[580px] max-h-[min(92dvh,900px)] overflow-y-auto rounded-[1.75rem] border border-white/90 bg-white p-6 shadow-[0_28px_70px_-22px_rgba(124,58,237,0.32)] sm:p-8">
+            <div className="signup-card relative w-full max-w-[460px] max-h-[min(92dvh,900px)] overflow-y-auto rounded-[1.75rem] border border-white/90 bg-white p-5 shadow-[0_28px_70px_-22px_rgba(124,58,237,0.32)] sm:p-6">
               <div
                 aria-hidden
-                className="absolute inset-x-8 top-0 h-1 rounded-b-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-400"
+                className="absolute inset-x-8 top-0 h-1 rounded-b-full bg-violet-600"
               />
 
               <div className="flex items-center gap-2.5">
@@ -318,7 +290,7 @@ export function SignupPage() {
                 </span>
               </div>
 
-              <h2 className="mt-5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+              <h2 className="mt-4 text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
                 Create your account
               </h2>
               <p className="mt-1 text-sm text-slate-500">
@@ -331,7 +303,7 @@ export function SignupPage() {
                 </p>
               )}
 
-              <form className="mt-5 space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
+              <form className="mt-4 space-y-3" onSubmit={(e) => void onSubmit(e)}>
                 <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-violet-200 bg-violet-50/80 p-1.5 shadow-inner shadow-violet-100/80">
                   {ROLES.map((item) => (
                     <button
@@ -524,7 +496,7 @@ export function SignupPage() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="relative flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-sm font-semibold !text-white shadow-lg shadow-violet-600/30 transition hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-60"
+                  className="relative flex w-full items-center justify-center rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold !text-white shadow-lg shadow-violet-600/30 transition hover:bg-violet-700 disabled:opacity-60"
                 >
                   <span>{busy ? 'Creating…' : 'Create account'}</span>
                   {!busy && (
@@ -541,7 +513,7 @@ export function SignupPage() {
                 Already have an account?{' '}
                 <Link
                   to="/auth/login"
-                  className="font-semibold text-violet-600 hover:text-violet-800"
+                  className="font-semibold !text-[var(--primary)] hover:!text-[var(--primary-deep)]"
                 >
                   Sign in
                 </Link>
