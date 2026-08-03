@@ -84,13 +84,13 @@ export function Header() {
           >
             <img
               className="brand-mark-img"
-              src="/styla-icon.svg"
+              src="/novera-icon.png"
               alt=""
-              width={28}
-              height={28}
+              width={25}
+              height={25}
               aria-hidden
             />
-            <span className="brand-name">Styla</span>
+            <span className="brand-name">Novera</span>
           </a>
         </div>
 

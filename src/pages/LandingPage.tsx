@@ -8,9 +8,9 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_#eef2ff_0%,_#fafaf9_45%,_#f5f5f4_100%)] text-stone-900">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
-        <span className="font-[Syne] text-2xl font-extrabold text-indigo-700">
-          Styla
+      <header className="page-x mx-auto flex max-w-6xl items-center justify-between py-5">
+        <span className="text-2xl font-extrabold tracking-tight text-indigo-700">
+          Novera
         </span>
         <nav className="flex items-center gap-3 text-sm font-semibold">
           {!loading && user ? (
@@ -24,13 +24,13 @@ export function LandingPage() {
             <>
               <Link
                 to="/auth/login"
-                className="rounded-full px-4 py-2 text-stone-700 hover:bg-white/70"
+                className="rounded-full px-4 py-2 font-semibold text-[var(--primary)] hover:bg-violet-50 hover:text-[var(--primary-deep)]"
               >
                 Sign in
               </Link>
               <Link
                 to="/auth/signup"
-                className="rounded-full bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+                className="rounded-full bg-[var(--primary)] px-4 py-2 !text-white hover:bg-[var(--primary-deep)]"
               >
                 Get started
               </Link>
@@ -39,31 +39,30 @@ export function LandingPage() {
         </nav>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-20 pt-10 md:pt-16">
+      <main className="page-x mx-auto max-w-6xl pb-20 pt-10 md:pt-16">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">
-          Marketplace + AI styling
+          Marketplace shopping
         </p>
-        <h1 className="mt-4 max-w-3xl font-[Syne] text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
+        <h1 className="mt-4 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
           Shop from real stores.
-          <span className="block text-indigo-700">Discover looks with AI.</span>
+          <span className="block text-indigo-700">All in one place.</span>
         </h1>
         <p className="mt-5 max-w-xl text-lg text-stone-600">
-          Styla is a dual-role marketplace: customers browse curated inventory,
-          shop owners manage products, and AI recommends from your Supabase
-          catalog — no external product APIs.
+          Novera is a dual-role marketplace: customers browse curated inventory,
+          and shop owners manage products from their own dashboard.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             to="/auth/signup"
-            className="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white hover:bg-stone-800"
+            className="rounded-full bg-[var(--primary)] px-6 py-3 text-sm font-semibold !text-white hover:bg-[var(--primary-deep)]"
           >
             Create account
           </Link>
           <Link
-            to="/customer/ai"
-            className="rounded-full border border-stone-300 bg-white/80 px-6 py-3 text-sm font-semibold text-stone-800 hover:bg-white"
+            to="/auth/login"
+            className="rounded-full border border-violet-300 bg-white/80 px-6 py-3 text-sm font-semibold text-[var(--primary)] hover:border-violet-400 hover:bg-violet-50 hover:text-[var(--primary-deep)]"
           >
-            Try AI discover
+            Sign in
           </Link>
         </div>
 
@@ -71,7 +70,7 @@ export function LandingPage() {
           {[
             {
               title: 'Customer space',
-              body: 'Browse Supabase products, wishlist, cart, and AI outfit help.',
+              body: 'Browse Supabase products, wishlist, cart, and orders.',
             },
             {
               title: 'Shop dashboard',

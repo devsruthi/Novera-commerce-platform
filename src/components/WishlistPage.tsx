@@ -89,7 +89,8 @@ export function WishlistPage() {
                   <p className="wishlist-card-price">
                     {formatMoney(product.price, product.currency)}
                     <span className="rating">
-                      {product.rating.toFixed(1)}★
+                      {product.rating.toFixed(1)}
+                      <span className="rating-star">★</span>
                       {product.reviewCount > 0 ? ` · ${product.reviewCount}` : ''}
                     </span>
                   </p>

@@ -240,7 +240,8 @@ function ComparePanel({
                 <td>Rating</td>
                 {selected.map((item) => (
                   <td key={item.product.id}>
-                    {item.product.rating.toFixed(1)}★ ({item.product.reviewCount})
+                    {item.product.rating.toFixed(1)}
+                    <span className="rating-star">★</span> ({item.product.reviewCount})
                   </td>
                 ))}
               </tr>
@@ -303,14 +304,14 @@ function AssistantPanel({
       <div className="assistant-panel-head">
         <img
           className="assistant-brand-icon"
-          src="/styla-icon.svg"
+          src="/novera-icon.png"
           alt=""
           width={40}
           height={40}
           aria-hidden
         />
         <div>
-          <p className="assistant-kicker">Styla</p>
+          <p className="assistant-kicker">Novera</p>
           <h2>AI Assistant</h2>
           <p>Chat to refine filters — results update underneath.</p>
         </div>
@@ -322,7 +323,7 @@ function AssistantPanel({
             <div key={m.id} className={`chat-row is-${m.role}`}>
               {m.role === 'assistant' && (
                 <span className="chat-avatar" aria-hidden>
-                  <img src="/styla-icon.svg" alt="" width={22} height={22} />
+                  <img src="/novera-icon.png" alt="" width={22} height={22} />
                 </span>
               )}
               <div className={`chat-bubble is-${m.role}`}>{m.text}</div>
@@ -331,7 +332,7 @@ function AssistantPanel({
           {busy && (
             <div className="chat-row is-assistant">
               <span className="chat-avatar" aria-hidden>
-                <img src="/styla-icon.svg" alt="" width={22} height={22} />
+                <img src="/novera-icon.png" alt="" width={22} height={22} />
               </span>
               <div className="chat-bubble is-assistant is-typing" aria-label="Thinking">
                 <span />
@@ -370,7 +371,7 @@ function AssistantPanel({
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Tell me how to refine the list…"
               disabled={busy}
-              aria-label="Message Styla assistant"
+              aria-label="Message Novera assistant"
             />
             <button
               type="submit"
@@ -402,7 +403,10 @@ function ReviewsPanel({
 
       <div className="review-stats">
         <div>
-          <strong>{summary.avgRating.toFixed(1)}★</strong>
+          <strong>
+            {summary.avgRating.toFixed(1)}
+            <span className="rating-star">★</span>
+          </strong>
           <span>Avg rating</span>
         </div>
         <div>

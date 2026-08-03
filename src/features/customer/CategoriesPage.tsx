@@ -10,8 +10,8 @@ export function CategoriesPage() {
   })
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-[Syne] text-3xl font-extrabold tracking-tight">
+    <main className="page-shell page-x py-6">
+      <h1 className="text-3xl font-extrabold tracking-tight">
         Categories
       </h1>
       <p className="mt-1 text-sm text-stone-500">

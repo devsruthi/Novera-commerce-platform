@@ -15,8 +15,8 @@ export function AuthShell({
     <div className="min-h-screen bg-gradient-to-br from-stone-100 via-indigo-50 to-slate-100 text-stone-900">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
         <Link to="/" className="mb-8 text-center">
-          <span className="font-[Syne] text-3xl font-extrabold tracking-tight text-indigo-700">
-            Styla
+          <span className="text-3xl font-extrabold tracking-tight text-indigo-700">
+            Novera
           </span>
         </Link>
         <div className="rounded-3xl border border-white/70 bg-white/90 p-7 shadow-xl shadow-indigo-900/5 backdrop-blur">

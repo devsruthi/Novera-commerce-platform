@@ -12,7 +12,7 @@ import { CategoriesPage } from '../features/customer/CategoriesPage'
 import { ProductDetailPage } from '../features/customer/ProductDetailPage'
 import { CustomerWishlistPage } from '../features/customer/CustomerWishlistPage'
 import { CustomerCartPage } from '../features/customer/CustomerCartPage'
-import { AiDiscoverPage } from '../features/ai/AiDiscoverPage'
+import { CustomerOrdersPage } from '../features/customer/CustomerOrdersPage'
 import { ShopLayout } from '../features/shop/ShopLayout'
 import { ShopDashboardPage } from '../features/shop/ShopDashboardPage'
 import { ShopProductsPage } from '../features/shop/ShopProductsPage'
@@ -20,6 +20,7 @@ import { ShopProductFormPage } from '../features/shop/ShopProductFormPage'
 import { ShopCategoriesPage } from '../features/shop/ShopCategoriesPage'
 import { ShopSettingsPage } from '../features/shop/ShopSettingsPage'
 import { ShopProfilePage } from '../features/shop/ShopProfilePage'
+import { ShopComingSoonPage } from '../features/shop/ShopComingSoonPage'
 
 function CategorySlugShopPage() {
   const { slug } = useParams()
@@ -45,8 +46,8 @@ export function AppRouter() {
           <Route path="product/:id" element={<ProductDetailPage />} />
           <Route path="wishlist" element={<CustomerWishlistPage />} />
           <Route path="cart" element={<CustomerCartPage />} />
+          <Route path="orders" element={<CustomerOrdersPage />} />
         </Route>
-        <Route path="/customer/ai" element={<AiDiscoverPage />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={['shop_owner']} />}>
@@ -56,6 +57,12 @@ export function AppRouter() {
           <Route path="products/new" element={<ShopProductFormPage />} />
           <Route path="products/:id/edit" element={<ShopProductFormPage />} />
           <Route path="categories" element={<ShopCategoriesPage />} />
+          <Route path="orders" element={<ShopComingSoonPage />} />
+          <Route path="customers" element={<ShopComingSoonPage />} />
+          <Route path="analytics" element={<ShopComingSoonPage />} />
+          <Route path="reviews" element={<ShopComingSoonPage />} />
+          <Route path="marketing" element={<ShopComingSoonPage />} />
+          <Route path="support" element={<ShopComingSoonPage />} />
           <Route path="settings" element={<ShopSettingsPage />} />
           <Route path="profile" element={<ShopProfilePage />} />
         </Route>

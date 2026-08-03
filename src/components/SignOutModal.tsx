@@ -39,7 +39,7 @@ export function SignOutModal({ open, onClose }: SignOutModalProps) {
         </button>
         <h2 id="signout-title">Sign out?</h2>
         <p className="modal-copy">
-          You’re signed in as <strong>{user.email}</strong>. Sign out of Styla on this
+          You’re signed in as <strong>{user.email}</strong>. Sign out of Novera on this
           device?
         </p>
         <div className="signout-actions">
