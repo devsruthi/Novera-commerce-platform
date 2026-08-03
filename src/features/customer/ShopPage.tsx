@@ -126,7 +126,41 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
   }
 
   return (
-    <main className="page-shell page-x py-6">
+    <main className="relative min-h-[70vh] overflow-hidden">
+      <div aria-hidden className="absolute inset-0 bg-[#faf8ff]" />
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <defs>
+          <linearGradient id="shopWaveA" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ddd6fe" stopOpacity="0.9" />
+            <stop offset="55%" stopColor="#ede9fe" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#faf8ff" stopOpacity="0.05" />
+          </linearGradient>
+          <linearGradient id="shopWaveB" x1="100%" y1="20%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#f5f3ff" stopOpacity="0.05" />
+          </linearGradient>
+        </defs>
+        <path
+          fill="url(#shopWaveA)"
+          d="M0 0h880C760 160 700 260 660 420c-50 200 0 330 150 480H0V0z"
+        />
+        <path
+          fill="url(#shopWaveB)"
+          d="M1440 0v900H640c160-100 240-240 280-400 40-180 10-320-100-500h620z"
+        />
+        <path
+          fill="#a78bfa"
+          fillOpacity="0.1"
+          d="M0 680c200-40 340-10 500 50s300 70 420 30c130-40 280-20 520 30v110H0V680z"
+        />
+      </svg>
+
+      <div className="page-shell page-x relative z-10 py-6">
       <header className="mb-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
@@ -301,6 +335,7 @@ export function ShopPage({ categorySlug }: { categorySlug?: string }) {
             </>
           )}
         </section>
+      </div>
       </div>
     </main>
   )
