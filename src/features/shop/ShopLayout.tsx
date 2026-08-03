@@ -144,6 +144,8 @@ export function ShopLayout() {
   })
 
   const shopName = shopQuery.data?.shop_name || 'Your shop'
+  const shopLogo = shopQuery.data?.logo || user?.avatar || null
+  const shopInitial = (shopName[0] || user?.name?.[0] || 'O').toUpperCase()
   const onProductsList = isProductsListPath(location.pathname)
   const searchValue = onProductsList ? (searchParams.get('q') ?? '') : ''
 
@@ -256,15 +258,15 @@ export function ShopLayout() {
             <div className="rounded-2xl bg-slate-50/80 p-3">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 overflow-hidden rounded-full bg-violet-100 ring-2 ring-white">
-                  {user?.avatar ? (
+                  {shopLogo ? (
                     <img
-                      src={user.avatar}
+                      src={shopLogo}
                       alt=""
                       className="h-full w-full object-cover"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-sm font-bold text-violet-700">
-                      {(user?.name?.[0] || 'O').toUpperCase()}
+                      {shopInitial}
                     </div>
                   )}
                 </div>

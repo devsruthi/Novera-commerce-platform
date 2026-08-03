@@ -84,6 +84,13 @@ function ActionIcon({ icon, count }: { icon: ReactNode; count: number }) {
   )
 }
 
+function userInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
+}
+
 function CustomerHeader() {
   const { user, signOut } = useAuth()
   const { itemCount } = useCart()
@@ -150,10 +157,25 @@ function CustomerHeader() {
 
             <div className="ml-1 hidden h-6 w-px bg-violet-100 sm:block" />
 
-            <div className="flex items-center gap-2 pl-1 text-sm">
-              <span className="hidden max-w-[7rem] truncate text-slate-500 md:inline">
-                {user?.name}
-              </span>
+            <div className="flex items-center gap-3 pl-1">
+              {user?.name && (
+                <div className="hidden items-center gap-2 md:flex" title={user.name}>
+                  <span
+                    aria-hidden
+                    className="grid h-8 w-8 place-items-center rounded-full bg-violet-100 text-[11px] font-bold uppercase tracking-wide text-violet-700"
+                  >
+                    {userInitials(user.name)}
+                  </span>
+                  <div className="min-w-0 leading-tight">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-500">
+                      Signed in
+                    </p>
+                    <p className="max-w-[9rem] truncate text-sm font-semibold capitalize text-slate-800">
+                      {user.name}
+                    </p>
+                  </div>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => setLogoutOpen(true)}
