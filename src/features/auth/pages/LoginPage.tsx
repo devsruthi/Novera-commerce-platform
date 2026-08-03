@@ -211,13 +211,11 @@ export function LoginPage() {
                 alt=""
                 className="h-10 w-10 rounded-xl object-cover shadow-md shadow-violet-400/30 sm:h-10 sm:w-10 sm:rounded-[14px]"
               />
-              <span className="text-2xl font-extrabold tracking-tight text-violet-700 sm:text-[1.445rem]">
-                NOVERA
-              </span>
+              <span className="brand-wordmark brand-wordmark-lg">Novera</span>
             </Link>
 
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-violet-100/90 px-3.5 py-1.5 text-sm font-semibold text-violet-700">
-              <span aria-hidden>✨</span>
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-violet-200/90 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-violet-700 shadow-sm backdrop-blur">
+              <span aria-hidden>✦</span>
               Welcome to Novera
             </span>
 
@@ -387,9 +385,7 @@ export function LoginPage() {
                   alt=""
                   className="h-9 w-9 rounded-[10px] object-cover shadow-sm shadow-violet-300/40"
                 />
-                <span className="text-base font-extrabold tracking-tight text-slate-900">
-                  NOVERA
-                </span>
+                <span className="brand-wordmark brand-wordmark-md">Novera</span>
               </div>
 
               <h2 className="mt-5 text-xl font-bold tracking-tight text-slate-900">

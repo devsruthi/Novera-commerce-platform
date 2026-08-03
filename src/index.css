@@ -101,6 +101,23 @@ a {
   max-width: 1400px;
 }
 
+/* Shared Novera brand wordmark — landing, login, signup */
+.brand-wordmark {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #6d28d9; /* violet-700 — matches --primary-deep */
+  line-height: 1;
+}
+
+.brand-wordmark-lg {
+  font-size: 1.5rem; /* text-2xl */
+}
+
+.brand-wordmark-md {
+  font-size: 1.125rem; /* text-lg */
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
