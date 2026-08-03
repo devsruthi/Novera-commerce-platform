@@ -1,26 +1,65 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
 import { homePathForRole } from '../../../services/authService'
 import type { UserRole } from '../../../types'
 
-const ROLES = [
-  { id: 'customer' as const, label: 'Customer' },
-  { id: 'shop_owner' as const, label: 'Shop owner' },
+const ROLES: {
+  id: UserRole
+  label: string
+  hint: string
+  icon: ReactNode
+}[] = [
+  {
+    id: 'customer',
+    label: 'Customer',
+    hint: 'Shop & discover',
+    icon: (
+      <svg viewBox="0 0 24 24" className="size-5" fill="none" aria-hidden>
+        <path
+          d="M20 21a8 8 0 0 0-16 0"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+        <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.7" />
+      </svg>
+    ),
+  },
+  {
+    id: 'shop_owner',
+    label: 'Seller',
+    hint: 'Sell & manage',
+    icon: (
+      <svg viewBox="0 0 24 24" className="size-5" fill="none" aria-hidden>
+        <path
+          d="M4 10h16v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        />
+        <path
+          d="M3 10l2.2-5.2A2 2 0 017 3.5h10a2 2 0 011.8 1.3L21 10"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
 ]
 
 const HIGHLIGHTS = [
-  {
-    title: 'Curated fashion',
-    text: 'Discover collections chosen for style — not noise. Save favorites and check out in a few taps.',
-    image: '/auth/login-shop.jpg',
-    badge: 'Shop',
-  },
   {
     title: 'Your own storefront',
     text: 'List products, organize categories, and keep inventory ready so every order ships smoothly.',
     image: '/auth/login-sell.jpg',
     badge: 'Sell',
+  },
+  {
+    title: 'Curated fashion',
+    text: 'Discover collections chosen for style — not noise. Save favorites and check out in a few taps.',
+    image: '/auth/login-shop.jpg',
+    badge: 'Shop',
   },
   {
     title: 'Insights that scale',
@@ -30,16 +69,63 @@ const HIGHLIGHTS = [
   },
 ]
 
+const FEATURES = [
+  {
+    label: 'Wishlist & Checkout',
+    icon: (
+      <svg viewBox="0 0 24 24" className="size-3.5" fill="none" aria-hidden>
+        <path
+          d="M12.1 20.3 4.6 13a5.1 5.1 0 0 1 7.2-7.2l.3.3.3-.3a5.1 5.1 0 0 1 7.2 7.2l-7.5 7.3Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: 'Shop Dashboard',
+    icon: (
+      <svg viewBox="0 0 24 24" className="size-3.5" fill="none" aria-hidden>
+        <path
+          d="M4 10h16v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        />
+        <path
+          d="M3 10l2.2-5.2A2 2 0 017 3.5h10a2 2 0 011.8 1.3L21 10"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: 'Sales Insights',
+    icon: (
+      <svg viewBox="0 0 24 24" className="size-3.5" fill="none" aria-hidden>
+        <path
+          d="M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+]
+
 const inputClass =
   'w-full rounded-xl border border-violet-300 bg-white py-2.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100'
 
 const inputToggleClass =
   'w-full rounded-xl border border-violet-300 bg-white py-2.5 pl-11 pr-12 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100'
 
-/** Single-viewport Novera signup — marketing slides + wide register form. */
+/** Signup — reference layout with role cards + marketing panel. */
 export function SignupPage() {
   const { register, user, loading, configured } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const roleParam = searchParams.get('role')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -52,6 +138,10 @@ export function SignupPage() {
   const [busy, setBusy] = useState(false)
   const [slide, setSlide] = useState(0)
   const [sliderPaused, setSliderPaused] = useState(false)
+
+  useEffect(() => {
+    setRole(roleParam === 'shop_owner' ? 'shop_owner' : 'customer')
+  }, [roleParam])
 
   const goToSlide = (index: number) => {
     setSlide((index + HIGHLIGHTS.length) % HIGHLIGHTS.length)
@@ -66,7 +156,15 @@ export function SignupPage() {
   }, [sliderPaused])
 
   if (!loading && user) {
-    return <Navigate to={homePathForRole(user.role)} replace />
+    if (roleParam === 'shop_owner' && user.role === 'shop_owner') {
+      return <Navigate to="/shop" replace />
+    }
+    if (roleParam === 'customer' && user.role === 'customer') {
+      return <Navigate to="/customer/shop" replace />
+    }
+    if (!roleParam) {
+      return <Navigate to={homePathForRole(user.role)} replace />
+    }
   }
 
   const onSubmit = async (e: FormEvent) => {
@@ -97,139 +195,116 @@ export function SignupPage() {
     }
   }
 
-  return (
-    <div className="relative h-dvh overflow-hidden text-slate-900">
-      <div aria-hidden className="absolute inset-0 bg-[#faf8ff]" />
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <defs>
-          <linearGradient id="signupWaveA" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ddd6fe" stopOpacity="0.95" />
-            <stop offset="55%" stopColor="#ede9fe" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#faf8ff" stopOpacity="0.1" />
-          </linearGradient>
-          <linearGradient id="signupWaveB" x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.45" />
-            <stop offset="50%" stopColor="#e9d5ff" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#f5f3ff" stopOpacity="0.05" />
-          </linearGradient>
-        </defs>
-        <path
-          fill="url(#signupWaveA)"
-          d="M0 0h920C780 140 720 240 680 400c-55 210-10 340 140 500H0V0z"
-        />
-        <path
-          fill="url(#signupWaveB)"
-          d="M1440 900H520c140-120 210-240 250-400 45-180 20-320-90-500h760v900z"
-        />
-        <path
-          fill="#a78bfa"
-          fillOpacity="0.12"
-          d="M0 620c180-40 320-20 480 40s300 80 420 40c140-45 280-30 420 20v180H0V620z"
-        />
-        <path
-          fill="#8b5cf6"
-          fillOpacity="0.08"
-          d="M0 720c200-50 360-30 520 30s310 70 460 20c130-40 280-20 460 40v90H0V720z"
-        />
-      </svg>
+  const activeHighlight = HIGHLIGHTS[slide]
 
-      <div className="page-shell page-x relative z-20 flex h-full items-center">
-        <div className="grid h-full w-full items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(400px,460px)] lg:gap-10 xl:gap-14">
+  return (
+    <div className="relative min-h-dvh overflow-hidden text-slate-900">
+      <div aria-hidden className="absolute inset-0 bg-[#f5f3ff]" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(rgba(124,58,237,0.12)_1px,transparent_1px)] [background-size:22px_22px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 top-10 size-[28rem] rounded-full bg-violet-300/25 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-20 bottom-0 size-[26rem] rounded-full bg-fuchsia-200/20 blur-3xl"
+      />
+
+      <div className="page-shell page-x relative z-20 flex min-h-dvh items-center py-6">
+        <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(380px,460px)] lg:gap-12 xl:gap-16">
           {/* Left marketing */}
-          <section className="relative z-20 flex max-w-xl flex-col justify-center gap-4 py-4 lg:py-0">
-            <Link to="/" className="relative z-10 inline-flex w-fit items-center gap-2.5">
+          <section className="relative z-20 flex max-w-xl flex-col justify-center gap-5">
+            <Link to="/" className="inline-flex w-fit items-center gap-2.5">
               <img
                 src="/novera-icon.png"
                 alt=""
-                className="h-10 w-10 rounded-xl object-cover shadow-md shadow-violet-400/30 sm:rounded-[14px]"
+                className="h-10 w-10 rounded-xl object-cover shadow-md shadow-violet-400/30"
               />
-              <span className="text-2xl font-extrabold tracking-tight text-violet-700 sm:text-[1.445rem]">
+              <span className="text-2xl font-extrabold tracking-tight text-slate-900">
                 NOVERA
               </span>
             </Link>
 
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-fuchsia-100/90 px-3.5 py-1.5 text-sm font-semibold text-fuchsia-700">
-              <span aria-hidden>✦</span>
+            <span className="inline-flex w-fit items-center rounded-full bg-violet-100 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-violet-700">
               Free to join · Ready in minutes
             </span>
 
             <div>
-              <h1 className="text-[2rem] font-extrabold leading-[1.12] tracking-tight sm:text-4xl xl:text-[2.75rem]">
-                <span className="login-headline-line block text-slate-900">
-                  Start your journey.
-                </span>
-                <span className="login-headline-accent block bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500 bg-clip-text text-transparent">
+              <h1 className="text-[2.1rem] font-extrabold leading-[1.1] tracking-tight sm:text-4xl xl:text-[2.85rem]">
+                <span className="block text-slate-900">Start your journey.</span>
+                <span className="mt-1 block bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500 bg-clip-text text-transparent">
                   Shop or sell today.
                 </span>
               </h1>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-500 sm:text-[15px]">
-                Create one account for browsing curated collections — or open your shop and grow sales from the same place.
+                Create one account for browsing curated collections — or open
+                your shop and grow sales from the same place.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {['Wishlist & checkout', 'Shop dashboard', 'Sales insights'].map((item) => (
+              {FEATURES.map((item) => (
                 <span
-                  key={item}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-violet-200/80 bg-white/70 px-3 py-1 text-xs font-semibold text-violet-700 backdrop-blur-sm"
+                  key={item.label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-violet-200/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-violet-700 shadow-sm backdrop-blur"
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
-                  {item}
+                  {item.icon}
+                  {item.label}
                 </span>
               ))}
             </div>
 
-            {/* Feature slider */}
             <div
-              className="relative"
+              className="relative mt-1"
               onMouseEnter={() => setSliderPaused(true)}
               onMouseLeave={() => setSliderPaused(false)}
             >
-              <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-md shadow-violet-200/40">
-                <div
-                  className="flex transition-transform duration-500 ease-out"
-                  style={{ transform: `translateX(-${slide * 100}%)` }}
-                >
-                  {HIGHLIGHTS.map((item) => (
-                    <article key={item.title} className="w-full shrink-0">
-                      <div className="relative h-[148px] overflow-hidden sm:h-[168px]">
-                        <img
-                          src={item.image}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-slate-900/25" />
-                        <span
-                          className={`absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide !text-white shadow-sm ${
-                            item.badge === 'Shop'
-                              ? 'bg-sky-500'
-                              : item.badge === 'Sell'
-                                ? 'bg-violet-600'
-                                : 'bg-fuchsia-500'
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      </div>
-                      <div className="px-4 py-3.5 sm:px-5 sm:py-4">
-                        <p className="text-base font-semibold text-slate-800">
-                          {item.title}
-                        </p>
-                        <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-slate-500 sm:text-sm">
-                          {item.text}
-                        </p>
-                      </div>
-                    </article>
+              <div className="relative overflow-hidden rounded-[1.5rem] border border-white/80 bg-white shadow-xl shadow-violet-200/40">
+                <div className="relative h-[200px] sm:h-[230px]">
+                  {HIGHLIGHTS.map((item, index) => (
+                    <img
+                      key={item.title}
+                      src={item.image}
+                      alt=""
+                      className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+                        index === slide ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
                   ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+                </div>
+
+                {/* Overlapping info card */}
+                <div className="absolute bottom-4 left-4 right-4 flex items-start gap-3 rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-lg backdrop-blur sm:right-auto sm:max-w-[260px]">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700">
+                    <svg viewBox="0 0 24 24" className="size-5" fill="none" aria-hidden>
+                      <path
+                        d="M4 7h16l-1.2 11.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8L4 7z"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                      />
+                      <path
+                        d="M9 7V5.5A3 3 0 0112 2.5v0a3 3 0 013 3V7"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-slate-900">
+                      {activeHighlight.title}
+                    </p>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500">
+                      {activeHighlight.text}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-2.5 flex items-center justify-between gap-3">
+              <div className="mt-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-1.5">
                   {HIGHLIGHTS.map((item, index) => (
                     <button
@@ -250,7 +325,7 @@ export function SignupPage() {
                     type="button"
                     aria-label="Previous slide"
                     onClick={() => goToSlide(slide - 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-700 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-700 shadow-sm transition hover:bg-violet-50"
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M15 18l-6-6 6-6" />
@@ -260,7 +335,7 @@ export function SignupPage() {
                     type="button"
                     aria-label="Next slide"
                     onClick={() => goToSlide(slide + 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-700 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-700 shadow-sm transition hover:bg-violet-50"
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M9 18l6-6-6-6" />
@@ -272,29 +347,30 @@ export function SignupPage() {
           </section>
 
           {/* Signup card */}
-          <section className="relative z-30 flex items-center justify-center py-3 lg:justify-end lg:py-0">
-            <div className="signup-card relative w-full max-w-[460px] max-h-[min(92dvh,900px)] overflow-y-auto rounded-[1.75rem] border border-white/90 bg-white p-5 shadow-[0_28px_70px_-22px_rgba(124,58,237,0.32)] sm:p-6">
+          <section className="relative z-30 flex items-center justify-center lg:justify-end">
+            <div className="relative w-full max-w-[460px] max-h-[min(92dvh,920px)] overflow-y-auto rounded-[1.75rem] border border-white/90 bg-white p-5 shadow-[0_28px_70px_-22px_rgba(124,58,237,0.32)] sm:p-6">
+              {/* Decorative fashion visuals */}
               <div
                 aria-hidden
-                className="absolute inset-x-8 top-0 h-1 rounded-b-full bg-violet-600"
-              />
-
-              <div className="flex items-center gap-2.5">
+                className="pointer-events-none absolute -right-2 -top-2 hidden h-28 w-36 sm:block"
+              >
                 <img
-                  src="/novera-icon.png"
+                  src="/auth/login-bag.jpg"
                   alt=""
-                  className="h-9 w-9 rounded-[10px] object-cover shadow-sm shadow-violet-300/40"
+                  className="absolute right-6 top-4 h-20 w-16 rotate-6 rounded-xl object-cover shadow-lg ring-2 ring-white"
                 />
-                <span className="text-base font-extrabold tracking-tight text-slate-900">
-                  NOVERA
-                </span>
+                <img
+                  src="/auth/login-shop.jpg"
+                  alt=""
+                  className="absolute right-0 top-10 h-16 w-20 -rotate-6 rounded-xl object-cover shadow-md ring-2 ring-white"
+                />
               </div>
 
-              <h2 className="mt-4 text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+              <h2 className="pr-24 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
                 Create your account
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Choose how you’ll use Novera, then fill in a few details.
+              <p className="mt-1 max-w-[280px] text-sm text-slate-500">
+                Choose how you want to continue, then fill in a few details.
               </p>
 
               {!configured && (
@@ -303,33 +379,80 @@ export function SignupPage() {
                 </p>
               )}
 
-              <form className="mt-4 space-y-3" onSubmit={(e) => void onSubmit(e)}>
-                <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-violet-200 bg-violet-50/80 p-1.5 shadow-inner shadow-violet-100/80">
-                  {ROLES.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => {
-                        setRole(item.id)
-                        const match = HIGHLIGHTS.findIndex(
-                          (h) =>
-                            (item.id === 'customer' && h.badge === 'Shop') ||
-                            (item.id === 'shop_owner' && h.badge === 'Sell'),
-                        )
-                        if (match >= 0) setSlide(match)
-                      }}
-                      className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-                        role === item.id
-                          ? 'border border-violet-200 bg-white text-violet-700 shadow-md shadow-violet-200/60'
-                          : 'border border-transparent text-slate-500 hover:bg-white/50 hover:text-slate-700'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
+              <form className="mt-5 space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
+                <fieldset>
+                  <legend className="mb-2 text-sm font-semibold text-slate-800">
+                    I want to continue as
+                  </legend>
+                  <div
+                    role="tablist"
+                    aria-label="Account type"
+                    className="grid grid-cols-2 gap-2.5"
+                  >
+                    {ROLES.map((item) => {
+                      const active = role === item.id
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={active}
+                          onClick={() => {
+                            setRole(item.id)
+                            const match = HIGHLIGHTS.findIndex(
+                              (h) =>
+                                (item.id === 'customer' && h.badge === 'Shop') ||
+                                (item.id === 'shop_owner' && h.badge === 'Sell'),
+                            )
+                            if (match >= 0) setSlide(match)
+                          }}
+                          className={`relative flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition ${
+                            active
+                              ? 'bg-violet-600 !text-white shadow-md shadow-violet-600/30'
+                              : 'border border-violet-200 bg-white text-slate-700 hover:border-violet-300 hover:bg-violet-50/60'
+                          }`}
+                        >
+                          {active && (
+                            <span className="absolute right-2 top-2 grid size-4 place-items-center rounded-full bg-white/20">
+                              <svg viewBox="0 0 24 24" className="size-2.5" fill="none" aria-hidden>
+                                <path
+                                  d="M5 12l5 5L20 7"
+                                  stroke="currentColor"
+                                  strokeWidth="2.6"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          )}
+                          <span
+                            className={`grid size-8 shrink-0 place-items-center rounded-lg ${
+                              active
+                                ? 'bg-white/15 !text-white'
+                                : 'bg-violet-50 text-violet-600'
+                            }`}
+                          >
+                            {item.icon}
+                          </span>
+                          <span className="min-w-0 pr-3">
+                            <span className="block text-base font-bold leading-tight">
+                              {item.label}
+                            </span>
+                            <span
+                              className={`mt-0.5 block text-[11px] leading-tight ${
+                                active ? 'text-violet-100' : 'text-slate-400'
+                              }`}
+                            >
+                              {item.hint}
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </fieldset>
 
-                <div className="grid gap-3.5 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <label className="block sm:col-span-2">
                     <span className="mb-1.5 block text-sm font-medium text-slate-600">
                       Full name
@@ -463,7 +586,7 @@ export function SignupPage() {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:text-violet-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-violet-500 transition hover:text-violet-700"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                         onClick={() => setShowPassword((v) => !v)}
                       >
@@ -496,15 +619,13 @@ export function SignupPage() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="relative flex w-full items-center justify-center rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold !text-white shadow-lg shadow-violet-600/30 transition hover:bg-violet-700 disabled:opacity-60"
+                  className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3.5 text-sm font-semibold !text-white shadow-lg shadow-violet-600/30 transition hover:bg-violet-700 disabled:opacity-60"
                 >
                   <span>{busy ? 'Creating…' : 'Create account'}</span>
                   {!busy && (
-                    <span className="absolute right-3.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
-                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                        <path d="M5 12h14M13 6l6 6-6 6" />
-                      </svg>
-                    </span>
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+                      <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   )}
                 </button>
               </form>
@@ -513,7 +634,7 @@ export function SignupPage() {
                 Already have an account?{' '}
                 <Link
                   to="/auth/login"
-                  className="font-semibold !text-[var(--primary)] hover:!text-[var(--primary-deep)]"
+                  className="font-semibold text-violet-700 hover:text-violet-900"
                 >
                   Sign in
                 </Link>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
 import { homePathForRole } from '../../../services/authService'
 
@@ -44,17 +44,27 @@ const FEATURES = [
 
 /** Single-viewport Novera login — soft solid backdrop + overlapping hero. */
 export function LoginPage() {
-  const { login, user, loading, configured } = useAuth()
+  const { login, user, loading, configured, signOut } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const asParam = searchParams.get('as')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  const [slide, setSlide] = useState(0)
+  const [signingOut, setSigningOut] = useState(false)
+  const [slide, setSlide] = useState(() =>
+    asParam === 'owner'
+      ? Math.max(
+          0,
+          FEATURES.findIndex((f) => f.audience === 'owner'),
+        )
+      : 0,
+  )
   const [sliderPaused, setSliderPaused] = useState(false)
   const [audience, setAudience] = useState<(typeof AUDIENCES)[number]['id']>(
-    'customer',
+    asParam === 'owner' ? 'owner' : 'customer',
   )
 
   const goToSlide = (index: number) => {
@@ -62,6 +72,17 @@ export function LoginPage() {
     setSlide(next)
     setAudience(FEATURES[next].audience)
   }
+
+  useEffect(() => {
+    if (asParam === 'owner') {
+      const ownerSlide = FEATURES.findIndex((f) => f.audience === 'owner')
+      setSlide(ownerSlide >= 0 ? ownerSlide : 1)
+      setAudience('owner')
+    } else if (asParam === 'customer') {
+      setSlide(0)
+      setAudience('customer')
+    }
+  }, [asParam])
 
   useEffect(() => {
     if (sliderPaused) return
@@ -75,8 +96,36 @@ export function LoginPage() {
     return () => window.clearInterval(id)
   }, [sliderPaused])
 
+  const customerDest = '/customer/shop'
+  const ownerDest = '/shop'
+
+  // Only auto-redirect when the signed-in role matches the intended path.
+  // Never send a shop owner to /shop when they clicked "Browse & buy" (as=customer).
   if (!loading && user) {
-    return <Navigate to={homePathForRole(user.role)} replace />
+    if (asParam === 'customer' && user.role === 'customer') {
+      return <Navigate to={customerDest} replace />
+    }
+    if (asParam === 'owner' && user.role === 'shop_owner') {
+      return <Navigate to={ownerDest} replace />
+    }
+    if (!asParam) {
+      return <Navigate to={homePathForRole(user.role)} replace />
+    }
+  }
+
+  const roleMismatch =
+    !loading &&
+    user &&
+    ((asParam === 'customer' && user.role !== 'customer') ||
+      (asParam === 'owner' && user.role !== 'shop_owner'))
+
+  const onSignOutToSwitch = async () => {
+    setSigningOut(true)
+    try {
+      await signOut()
+    } finally {
+      setSigningOut(false)
+    }
   }
 
   const onSubmit = async (e: FormEvent) => {
@@ -89,7 +138,29 @@ export function LoginPage() {
         setError(result.error ?? 'Sign-in failed.')
         return
       }
-      if (result.user) navigate(homePathForRole(result.user.role), { replace: true })
+      if (result.user) {
+        if (asParam === 'customer') {
+          if (result.user.role === 'customer') {
+            navigate(customerDest, { replace: true })
+          } else {
+            setError(
+              'This account is a shop owner. Use Sell & manage, or sign in with a customer account.',
+            )
+          }
+          return
+        }
+        if (asParam === 'owner') {
+          if (result.user.role === 'shop_owner') {
+            navigate(ownerDest, { replace: true })
+          } else {
+            setError(
+              'This account is a customer. Use Browse & buy, or sign in with a shop owner account.',
+            )
+          }
+          return
+        }
+        navigate(homePathForRole(result.user.role), { replace: true })
+      }
     } finally {
       setBusy(false)
     }
@@ -334,6 +405,28 @@ export function LoginPage() {
                 </p>
               )}
 
+              {roleMismatch && (
+                <div className="mt-4 rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-3 text-sm text-violet-900">
+                  <p className="font-semibold">
+                    You&apos;re signed in as a{' '}
+                    {user?.role === 'shop_owner' ? 'shop owner' : 'customer'}.
+                  </p>
+                  <p className="mt-1 text-violet-800/80">
+                    {asParam === 'customer'
+                      ? 'Sign out first to continue as a customer and browse products.'
+                      : 'Sign out first to continue as a shop owner.'}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={signingOut}
+                    onClick={() => void onSignOutToSwitch()}
+                    className="mt-3 inline-flex rounded-xl bg-violet-600 px-3.5 py-2 text-sm font-semibold !text-white transition hover:bg-violet-700 disabled:opacity-60"
+                  >
+                    {signingOut ? 'Signing out…' : 'Sign out & continue'}
+                  </button>
+                </div>
+              )}
+
               <form className="mt-5 space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
                 <label className="block">
                   <span className="mb-1.5 block text-sm font-medium text-slate-600">
@@ -440,7 +533,11 @@ export function LoginPage() {
               <p className="mt-5 text-center text-sm text-slate-500">
                 New here?{' '}
                 <Link
-                  to="/auth/signup"
+                  to={
+                    asParam === 'owner'
+                      ? '/auth/signup?role=shop_owner'
+                      : '/auth/signup'
+                  }
                   className="font-semibold !text-[var(--primary)] hover:!text-[var(--primary-deep)]"
                 >
                   Create an account

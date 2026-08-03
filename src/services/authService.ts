@@ -187,5 +187,5 @@ export async function signOut(): Promise<void> {
 }
 
 export function homePathForRole(role: UserRole): string {
-  return role === 'shop_owner' ? '/shop' : '/customer'
+  return role === 'shop_owner' ? '/shop' : '/customer/shop'
 }
