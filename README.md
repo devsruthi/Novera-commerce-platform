@@ -1,4 +1,4 @@
-# Styla — Shopping Assistant
+# Novera — Shopping Assistant
 
 Multi-role fashion/electronics marketplace: customers browse and buy; shop owners manage inventory. Catalog, auth, and storage run on **Supabase**; AI Discover uses a small Vite middleware + OpenAI.
 
