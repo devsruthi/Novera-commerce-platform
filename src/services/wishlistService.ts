@@ -6,6 +6,16 @@ import { mapDbProduct } from './productService'
 const PRODUCT_SELECT =
   'product_id, products(*, categories(id, name, slug, image), shops(id, shop_name, logo))'
 
+/** Nested FK select is typed loosely by Supabase; normalize object vs one-element array. */
+function nestedProduct(value: unknown): DbProduct | null {
+  if (!value) return null
+  if (Array.isArray(value)) {
+    const first = value[0]
+    return first ? (first as DbProduct) : null
+  }
+  return value as DbProduct
+}
+
 export async function fetchWishlist(userId: string): Promise<Product[]> {
   const { data, error } = await getSupabase()
     .from('wishlist')
@@ -17,7 +27,7 @@ export async function fetchWishlist(userId: string): Promise<Product[]> {
 
   return (data ?? [])
     .map((row) => {
-      const product = (row as { products?: DbProduct | null }).products
+      const product = nestedProduct(row.products)
       return product ? mapDbProduct(product) : null
     })
     .filter((p): p is Product => !!p)
