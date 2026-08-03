@@ -115,9 +115,7 @@ export function ResetPasswordPage() {
                   alt=""
                   className="h-9 w-9 rounded-[10px] object-cover shadow-sm shadow-violet-300/40"
                 />
-                <span className="text-base font-extrabold tracking-tight text-slate-900">
-                  NOVERA
-                </span>
+                <span className="brand-wordmark brand-wordmark-md">Novera</span>
               </Link>
 
               <h2 className="mt-5 text-xl font-bold tracking-tight text-slate-900">

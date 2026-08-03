@@ -223,12 +223,11 @@ export function SignupPage() {
                 alt=""
                 className="h-10 w-10 rounded-xl object-cover shadow-md shadow-violet-400/30"
               />
-              <span className="text-2xl font-extrabold tracking-tight text-slate-900">
-                NOVERA
-              </span>
+              <span className="brand-wordmark brand-wordmark-lg">Novera</span>
             </Link>
 
-            <span className="inline-flex w-fit items-center rounded-full bg-violet-100 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-violet-700">
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-violet-200/90 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-violet-700 shadow-sm backdrop-blur">
+              <span aria-hidden>✦</span>
               Free to join · Ready in minutes
             </span>
 

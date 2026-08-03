@@ -120,9 +120,7 @@ export function ForgotPasswordPage() {
                   alt=""
                   className="h-9 w-9 rounded-[10px] object-cover shadow-sm shadow-violet-300/40"
                 />
-                <span className="text-base font-extrabold tracking-tight text-slate-900">
-                  NOVERA
-                </span>
+                <span className="brand-wordmark brand-wordmark-md">Novera</span>
               </Link>
 
               <div className="mt-5 flex size-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
