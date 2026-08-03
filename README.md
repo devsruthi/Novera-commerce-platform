@@ -1,12 +1,12 @@
-# Novera — Shopping Assistant
+# Novera — Shop & Sell
 
-Multi-role fashion/electronics marketplace: customers browse and buy; shop owners manage inventory. Catalog, auth, and storage run on **Supabase**; AI Discover uses a small Vite middleware + OpenAI.
+A dual-role fashion marketplace: **customers** browse, wishlist, cart, and order; **shop owners** manage inventory, categories, and storefront settings. Catalog, auth, cart/wishlist, orders, and media run on **Supabase**.
 
 ## Quick start
 
 ```bash
 cp .env.example .env.local
-# Fill VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, OPENAI_API_KEY
+# Fill VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev
 ```
@@ -17,27 +17,53 @@ Apply Supabase SQL in order (see [Database](#database)): Phase 1 → 2 → 3, th
 
 ---
 
+## Features
+
+### Customers (`/customer`)
+
+| Area | What you get |
+|---|---|
+| Home | Brand hero, category strip, featured products |
+| Shop | Browse with search, filters (price, rating, brand, size), sort, grid/list, load more |
+| Categories | Category directory and slug-scoped listings |
+| Product detail | Image gallery, sizes, quantity, add to cart, wishlist |
+| Wishlist | Saved items synced to Supabase |
+| Cart | Line items, shipping threshold, payment method picker, place order |
+| Orders | Order history, status filters, timeline, cancel when allowed |
+
+### Shop owners (`/shop`)
+
+| Area | What you get |
+|---|---|
+| Dashboard | KPIs, sales chart, top products, recent activity |
+| Products | Inventory list + create/edit (images, price, stock, brand, category, colors, sizes, tags, featured) |
+| Categories | Create/edit categories and images |
+| Store settings | Shop name, description, address, logo upload |
+| Profile | Owner name, phone, avatar |
+
+Coming soon in the owner nav: orders, customers, analytics, reviews, marketing, support.
+
+### Auth
+
+Login, signup (choose **customer** or **shop owner**), forgot/reset password. Signup stores `role` (and optional `shop_name`) in auth metadata; a DB trigger creates `profiles` and, for owners, a `shops` row.
+
+---
+
 ## Architecture
 
-### High-level
-
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  React SPA (Vite + TypeScript + Tailwind)                   │
-│  features/auth | customer | shop | ai                       │
-│  services/* → Supabase JS client                            │
-└───────────────┬──────────────────────────┬──────────────────┘
-                │                          │
-                ▼                          ▼
-     ┌──────────────────┐       ┌─────────────────────┐
-     │ Supabase         │       │ Vite middleware     │
-     │ Auth · Postgres  │       │ /api/ai/* (OpenAI)  │
-     │ Storage · RLS    │       │ Intent parse / chat │
-     └──────────────────┘       └─────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  React SPA (Vite + TypeScript + Tailwind)       │
+│  features/auth · customer · shop                │
+│  services/* → Supabase JS client                │
+└──────────────────────┬──────────────────────────┘
+                       ▼
+            ┌──────────────────────┐
+            │ Supabase             │
+            │ Auth · Postgres      │
+            │ Storage · RLS        │
+            └──────────────────────┘
 ```
-
-- **Catalog path is Supabase-only** (no SerpAPI in the product browse path).
-- **AI Discover** is isolated under `src/features/ai` and ranks products loaded from Supabase.
 
 ### Roles & routing
 
@@ -46,54 +72,42 @@ Apply Supabase SQL in order (see [Database](#database)): Phase 1 → 2 → 3, th
 | `customer` | `/customer` | `ProtectedRoute` with `roles={['customer']}` |
 | `shop_owner` | `/shop` | `ProtectedRoute` with `roles={['shop_owner']}` |
 
-Signup stores `role` (and optional `shop_name`) in auth metadata. A DB trigger creates `profiles` and, for shop owners, an empty `shops` row.
-
-**Customer routes:** home, shop browse/filters, categories, product detail, wishlist, cart, AI Discover (`/customer/ai`).
-
-**Shop owner routes:** dashboard, products CRUD, categories, shop settings, profile.
-
 ### Frontend layers
 
 | Layer | Path | Responsibility |
 |---|---|---|
 | Routes / guards | `src/app/` | Router, `ProtectedRoute`, providers |
-| Features | `src/features/{auth,customer,shop,ai}/` | UI by domain |
-| Context | `src/context/` | Auth, cart, wishlist session state |
+| Features | `src/features/{auth,customer,shop}/` | UI by domain |
+| Context | `src/context/` | Auth, cart, wishlist, orders |
 | Services | `src/services/` | Supabase queries & mutations |
-| Lib | `src/lib/` | AI helpers, ranking, Supabase client |
+| Lib | `src/lib/` | Helpers, Supabase client |
 | Types | `src/types/` | Domain + DB row shapes |
 
-**Services (data access):**
+**Services:** `authService`, `productService`, `shopService` / `shopProductService`, `cartService`, `wishlistService`, `storageService`, order helpers via orders context.
 
-- `authService` — signup/login, role redirect
-- `productService` — public catalog (featured, browse, filters, categories)
-- `shopService` / `shopProductService` — owner shop + inventory
-- `cartService` / `wishlistService` — customer cart & wishlist
-- `storageService` — avatars, logos, product images
-
-**Providers stack:** React Query → Auth → Wishlist → Cart → Router.
-
-### AI Discover (isolated)
-
-| Piece | Location |
-|---|---|
-| UI | `src/features/ai/AiDiscoverPage.tsx` |
-| Client API | `src/lib/aiApi.ts` |
-| Rule fallback parse | `src/lib/parseQuery.ts` |
-| Ranking / outfits | `src/lib/rankProducts.ts`, `outfitBuilder.ts` |
-| Server | `server/aiPlugin.ts` → `/api/ai/*` |
-
-OpenAI key stays server-side (`OPENAI_API_KEY`). Without a key, parse falls back to rules.
+**Providers:** React Query → Auth → Wishlist → Cart → Router (OrdersProvider inside customer layout).
 
 ### Request flow (examples)
 
-**Browse products:** page → `productService` → Supabase `products` (+ joins) → React Query cache.
+**Browse products:** page → `productService` → Supabase `products` → React Query cache.
 
 **Add to cart:** UI → `cartService` → `ensure_my_cart()` + `cart_lines` (RLS: customer owns cart).
 
-**Shop inventory create:** form → `shopProductService` + Storage upload under `{shop_id}/…` → `products` insert (RLS: `is_shop_owner_of`).
+**Place order:** cart → orders context → `orders` / `order_items`.
 
-**AI search:** query → `/api/ai/parse` → filters → `productService` / ranking → ranked results in UI.
+**Shop inventory create:** form → `shopProductService` + Storage under `{shop_id}/…` → `products` insert (RLS: `is_shop_owner_of`).
+
+---
+
+## Tech stack
+
+- React 19 · TypeScript · Vite
+- React Router 7 · TanStack React Query 5
+- Tailwind CSS 4
+- Supabase (Auth, Postgres, Storage, RLS)
+- Recharts (shop dashboard)
+
+Brand: **Novera** · violet primary · Outfit font.
 
 ---
 
@@ -113,7 +127,7 @@ Postgres via Supabase. SQL lives in [`supabase/`](supabase/). Apply in the SQL E
 
 Phase notes: [`PHASE1.md`](supabase/PHASE1.md) · [`PHASE2.md`](supabase/PHASE2.md) · [`PHASE3.md`](supabase/PHASE3.md).
 
-`schema.sql` is the older legacy schema (jsonb cart/wishlist/orders). The app uses the Phase 1–3 relational model; legacy tables may remain unused.
+`schema.sql` includes legacy / orders-related tables used by customer checkout. Prefer the Phase 1–3 relational model for catalog, cart, and wishlist.
 
 ### Entity relationship
 
@@ -135,81 +149,26 @@ profiles ─────────────┬─────────�
                  (category_id)       (product_id, qty, size)
 ```
 
-### Tables
+### Tables (summary)
 
-#### `profiles`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid PK | = `auth.users.id` |
-| `email` | text | |
-| `name` | text | |
-| `phone` | text? | |
-| `avatar` | text? | Storage URL |
-| `role` | `user_role` | `customer` \| `shop_owner` |
-| `created_at` | timestamptz | |
-
-#### `shops`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid PK | |
-| `owner_id` | uuid FK → profiles | Unique (one shop per owner) |
-| `shop_name`, `description` | text | |
-| `logo`, `address` | text? | |
-| `rating` | numeric 0–5 | |
-| `created_at` | timestamptz | |
-
-#### `categories`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid PK | |
-| `name` | text unique | Seeded defaults (Dresses, Tops, …) |
-| `slug` | text unique? | URL segment |
-| `image` | text? | |
-
-#### `products`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid PK | |
-| `shop_id` | uuid FK → shops | Cascade delete |
-| `category_id` | uuid FK → categories? | Set null on delete |
-| `title`, `description`, `brand` | text | |
-| `price`, `discount_price` | numeric | ≥ 0 |
-| `stock` | int ≥ 0 | |
-| `images`, `colors`, `sizes`, `tags` | text[] | |
-| `featured` | boolean | |
-| `rating` | numeric 0–5 | |
-| `created_at` | timestamptz | |
-
-Indexes include shop/category/price, featured partial index, trigram on `title`, GIN on `tags`/`colors`.
-
-#### `wishlist`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid PK | |
-| `customer_id` | uuid FK → profiles | |
-| `product_id` | uuid FK → products | |
-| `created_at` | timestamptz | Unique `(customer_id, product_id)` |
-
-#### `carts` / `cart_lines`
-| Table | Key columns |
+| Table | Purpose |
 |---|---|
-| `carts` | `customer_id` unique → one cart per customer |
-| `cart_lines` | `cart_id`, `product_id`, `quantity`, `size`; unique `(cart_id, product_id, size)` |
+| `profiles` | User profile, role, avatar |
+| `shops` | One storefront per shop owner |
+| `categories` | Shared catalog categories |
+| `products` | Shop inventory (price, stock, images, sizes, featured, …) |
+| `wishlist` | Customer saved products |
+| `carts` / `cart_lines` | One cart per customer; lines by product + size |
+| `orders` / `order_items` | Customer checkout history |
 
-Helper: `ensure_my_cart()` returns/creates the authenticated user’s cart id.
-
-### Auth trigger & helpers
-
-- **`handle_new_user`** — on `auth.users` insert: upsert profile from metadata; create shop if `shop_owner`.
-- **`current_role()`** — role of `auth.uid()`.
-- **`is_shop_owner_of(shop_id)`** — ownership check for RLS and storage.
+Helpers: `handle_new_user`, `current_role()`, `is_shop_owner_of(shop_id)`, `ensure_my_cart()`.
 
 ### Row Level Security (summary)
 
 | Resource | Read | Write |
 |---|---|---|
 | `profiles` | Own row | Own row |
-| `shops` | Anyone | Owner (role `shop_owner`) |
+| `shops` | Anyone | Owner |
 | `categories` | Anyone | Shop owners (Phase 3) |
 | `products` | Anyone | Owning shop only |
 | `wishlist` / `carts` / `cart_lines` | Owning customer | Owning customer |
@@ -231,13 +190,11 @@ Mime: jpeg/png/webp/gif. Limits: 5 MB avatars/logos, 10 MB product images.
 ```
 src/
   app/           Router, providers, route guards
-  features/      auth, customer, shop, ai
+  features/      auth, customer, shop
   services/      Supabase data layer
-  context/       Client session state
-  lib/           AI, ranking, supabase client
+  context/       Auth, cart, wishlist, orders
+  lib/           Shared helpers, Supabase client
   types/         Shared TypeScript types
-server/
-  aiPlugin.ts    OpenAI middleware for Vite
 supabase/        Schema, RLS, storage, seeds
 ```
 
@@ -245,7 +202,7 @@ supabase/        Schema, RLS, storage, seeds
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Vite dev server (+ AI middleware) |
+| `npm run dev` | Vite dev server |
 | `npm run build` | Typecheck + production build |
 | `npm run preview` | Serve production build |
 | `npm run lint` | ESLint |
@@ -254,5 +211,5 @@ supabase/        Schema, RLS, storage, seeds
 
 See [`.env.example`](.env.example):
 
-- `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` — client Supabase
-- `OPENAI_API_KEY` / `OPENAI_MODEL` — server-only AI (default model `gpt-4o-mini`)
+- `VITE_SUPABASE_URL` — Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` — Supabase anon/public key
