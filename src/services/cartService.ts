@@ -6,6 +6,16 @@ import { mapDbProduct } from './productService'
 const LINE_SELECT =
   'id, product_id, size, quantity, products(*, categories(id, name, slug, image), shops(id, shop_name, logo))'
 
+/** Nested FK select is typed loosely by Supabase; normalize object vs one-element array. */
+function nestedProduct(value: unknown): DbProduct | null {
+  if (!value) return null
+  if (Array.isArray(value)) {
+    const first = value[0]
+    return first ? (first as DbProduct) : null
+  }
+  return value as DbProduct
+}
+
 async function getOrCreateCartId(userId: string): Promise<string> {
   const supabase = getSupabase()
   const { data: existing } = await supabase
@@ -37,12 +47,13 @@ function lineToItem(row: {
   product_id: string
   size: string
   quantity: number
-  products?: DbProduct | null
+  products?: unknown
 }): CartItem | null {
-  if (!row.products) return null
+  const product = nestedProduct(row.products)
+  if (!product) return null
   return {
     key: `${row.product_id}::${row.size}`,
-    product: mapDbProduct(row.products),
+    product: mapDbProduct(product),
     size: row.size,
     quantity: row.quantity,
   }
@@ -58,7 +69,14 @@ export async function fetchCartItems(userId: string): Promise<CartItem[]> {
 
   if (error) throw new Error(error.message)
   return (data ?? [])
-    .map((row) => lineToItem(row as Parameters<typeof lineToItem>[0]))
+    .map((row) =>
+      lineToItem({
+        product_id: String(row.product_id),
+        size: String(row.size),
+        quantity: Number(row.quantity),
+        products: row.products,
+      }),
+    )
     .filter((item): item is CartItem => !!item)
 }
 
